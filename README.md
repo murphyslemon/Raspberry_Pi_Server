@@ -16,7 +16,6 @@
 - Scalable (The voting remotes shall be plug and play)
 
 ## Raspberry related teams
-Voting device repository can be accessed [here](https://github.com/murphyslemon/Voting_Device).
 ### Votes processing
 **Magnus / Aleksi**
 Basically the backend server. Handles organizing votes, receiving the votes from end-user devices, tallying and forwarding the results to any services that require them. Handles confirmation of received votes
@@ -30,6 +29,7 @@ Takes results of votes and prints them and or creates a PDF for users. (Can also
 Handles displaying the end results of votes for the users, most likely through a website hosted on the raspberry.
 
 ## Voting device related teams
+Voting device repository can be accessed [here](https://github.com/murphyslemon/Voting_Device).
 ### Programming
 **Felix / Nadim**
 Handles any end device related programming.
