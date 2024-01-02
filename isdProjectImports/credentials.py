@@ -1,7 +1,7 @@
 
 # Database credentials
-dbUsername = 'root'
-dbPassword = '5579'
+dbUsername = ''
+dbPassword = ''
 dbHostname = 'localhost'
 dbPort = '3306'
-dbName = 'isdprojectdb'
+dbName = ''
