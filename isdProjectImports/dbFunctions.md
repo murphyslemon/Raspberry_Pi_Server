@@ -2,16 +2,16 @@
 <br><br>
 # Function: `get_registered_esps()`
 
-### Description:
+Description:
 This function retrieves all registered ESPs along with associated user information from the database.
 
-### Arguments:
+Arguments:
 None
 
-### JSON Return:
+JSON Return:
 The function returns a JSON array containing objects representing registered ESPs and their associated users. 
 
-#### Example JSON Response:
+Example JSON Response:
 ```json
 [
     {
@@ -44,16 +44,16 @@ In case of an exception, the function returns a JSON object with an error messag
 <br><br>
 # Function: `get_all_esps()`
 
-### Description:
+Description:
 This function retrieves all Electronic Service Providers (ESPs) from the database.
 
-### Arguments:
+Arguments:
 None
 
-### JSON Return:
+JSON Return:
 The function returns a JSON array containing objects representing all ESPs available in the database.
 
-#### Example JSON Response:
+Example JSON Response:
 ```json
 [
     {
@@ -78,16 +78,16 @@ In case of an exception, the function returns a JSON object with an error messag
 <br><br>
 # Function: `get_all_topics()`
 
-### Description:
+Description:
 This function retrieves all topics from the database.
 
-### Arguments:
+Arguments:
 None
 
-### JSON Return:
+JSON Return:
 The function returns a JSON array containing objects representing all topics available in the database.
 
-#### Example JSON Response:
+Example JSON Response:
 ```json
 [
     {
@@ -109,16 +109,16 @@ In case of an exception, the function returns a JSON object with an error messag
 <br><br>
 # Function: `get_topic(topicID)`
 
-### Description:
+Description:
 This function retrieves a specific topic from the database based on the provided `topicID`.
 
-### Arguments:
+Arguments:
 - `topicID` (integer): Unique identifier of the topic to be retrieved.
 
-### JSON Return:
+JSON Return:
 The function returns a JSON object representing the specific topic based on the provided `topicID`.
 
-#### Example JSON Response:
+Example JSON Response:
 ```json
 {
     "TopicID": "Topic_ID",
@@ -137,16 +137,16 @@ In case of an exception, the function returns a JSON object with an error messag
 <br><br>
 # Function: `get_votes(topicID)`
 
-### Description:
+Description:
 This function retrieves all votes from the database based on the provided `topicID`.
 
-### Arguments:
+Arguments:
 - `topicID` (integer): Unique identifier of the topic to retrieve votes for.
 
-### JSON Return:
+JSON Return:
 The function returns a JSON array containing objects representing all votes related to the specified `topicID`.
 
-#### Example JSON Response:
+Example JSON Response:
 ```json
 [
     {
@@ -168,16 +168,16 @@ In case of an exception, the function returns a JSON object with an error messag
 <br><br>
 # Function: `get_votes_by_user(userID)`
 
-### Description:
+Description:
 This function retrieves all votes from the database associated with the provided `userID`.
 
-### Arguments:
+Arguments:
 - `userID` (integer): Unique identifier of the user to retrieve votes for.
 
-### JSON Return:
+JSON Return:
 The function returns a JSON array containing objects representing all votes related to the specified `userID`.
 
-#### Example JSON Response:
+Example JSON Response:
 ```json
 [
     {
@@ -199,16 +199,16 @@ In case of an exception, the function returns a JSON object with an error messag
 <br><br>
 # Function: `register_esp(mac_address)`
 
-### Description:
+Description:
 This function modifies the device ID and registered status of an existing ESP based on the provided `mac_address`.
 
-### Arguments:
+Arguments:
 - `mac_address` (string): MAC address of the ESP to be modified.
 
-### JSON Return:
+JSON Return:
 The function returns a tuple containing a boolean value and either an object representing the modified ESP or an error message.
 
-#### Example JSON Response (Success):
+Example JSON Response (Success):
 ```json
 [
     true,
@@ -233,16 +233,16 @@ In case of an exception, the function returns a tuple containing a boolean value
 <br><br>
 # Function: `add_esp(mac_address)`
 
-### Description:
+Description:
 This function creates a new ESP with the provided `mac_address`.
 
-### Arguments:
+Arguments:
 - `mac_address` (string): MAC address for the new ESP.
 
-### JSON Return:
+JSON Return:
 The function returns a tuple containing a boolean value and either an object representing the newly created ESP or an error message.
 
-#### Example JSON Response (Success):
+Example JSON Response (Success):
 ```json
 [
     true,
@@ -267,16 +267,16 @@ In case of an exception, the function returns a tuple containing a boolean value
 <br><br>
 # Function: `unregister_esp(device_index)`
 
-### Description:
+Description:
 This function unregisters a specific ESP based on the provided `device_index`.
 
-### Arguments:
+Arguments:
 - `device_index` (integer): Device index of the ESP to be unregistered.
 
-### JSON Return:
+JSON Return:
 The function returns a tuple containing a boolean value and either an object representing the unregistered ESP or an error message.
 
-#### Example JSON Response (Success):
+Example JSON Response (Success):
 ```json
 [
     true,
@@ -301,16 +301,16 @@ In case of an exception, the function returns a tuple containing a boolean value
 <br><br>
 # Function: `unregister_all_esps()`
 
-### Description:
+Description:
 This function unregisters all Electronic Service Providers (ESPs) from the system.
 
-### Arguments:
+Arguments:
 None
 
-### JSON Return:
+JSON Return:
 The function returns a tuple containing a boolean value and either a success message or an error message.
 
-#### Example JSON Response (Success):
+Example JSON Response (Success):
 ```json
 [
     true,
@@ -327,16 +327,16 @@ In case of an exception, the function returns a tuple containing a boolean value
 <br><br>
 # Function: `create_topic(obj: voteHandling.VoteInformation)`
 
-### Description:
+Description:
 This function adds a new topic (vote) to the database.
 
-### Arguments:
+Arguments:
 - `obj` (voteHandling.VoteInformation): An object containing information about the topic to be created, including its title, description, start time, and end time.
 
-### JSON Return:
+JSON Return:
 The function returns a tuple containing a boolean value and either a success message or an error message.
 
-#### Example JSON Response (Success):
+Example JSON Response (Success):
 ```json
 [
     true,
@@ -353,17 +353,17 @@ In case of an exception, the function returns a tuple containing a boolean value
 <br><br>
 # Function: `create_user(username, deviceID)`
 
-### Description:
+Description:
 This function registers a user to an Electronic Service Provider (ESP) by creating a new user in the database.
 
-### Arguments:
+Arguments:
 - `username` (string): The username of the new user.
 - `deviceID` (integer): The device index of the ESP to which the user will be associated.
 
-### JSON Return:
+JSON Return:
 The function returns a tuple containing a boolean value and either a success message or an error message.
 
-#### Example JSON Response (Success):
+Example JSON Response (Success):
 ```json
 [
     true,
@@ -380,17 +380,17 @@ In case of an exception, the function returns a tuple containing a boolean value
 <br><br>
 # Function: `assign_user_to_esp(userID, espID)`
 
-### Description:
+Description:
 This function assigns a user to an Electronic Service Provider (ESP) by linking their device index to the ESP.
 
-### Arguments:
+Arguments:
 - `userID` (integer): The ID of the user to be assigned.
 - `espID` (integer): The ID of the ESP to which the user will be assigned.
 
-### JSON Return:
+JSON Return:
 The function returns a tuple containing a boolean value and either a success message or an error message.
 
-#### Example JSON Response (Success):
+Example JSON Response (Success):
 ```json
 [
     true,

@@ -127,6 +127,7 @@ def assignUserToESP():
     except:
         return jsonify({'message': 'Invalid data.'}), 400 # TODO: change return message to something more descriptive.
 
+
 if __name__ == '__main__':
     # Initialize imported app extensions.
     dbFunctions.db.init_app(app)
