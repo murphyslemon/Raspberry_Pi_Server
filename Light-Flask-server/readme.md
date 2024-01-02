@@ -10,22 +10,15 @@ The server requires all of the following installed on the machine running the se
 - Flask-mqtt module  (https://pypi.org/project/Flask-MQTT/)
 - Mosquitto MQTT broker
 
-## Features.
-
-The server includes a light version of the ESP registration process and a template for custom tests using the **/test/server/receive_message** and **/test/est/send_message topics**.
-
-## Registration process flowchart.
-ESP initiates registration process
-```mermaid
-graph LR
-A[ESP] -- ESP registration message --> B(Topic: /registration/Server/ESP-Mac-address)
-B --> D[SERVER]
-```
-Server responds to registration
-```mermaid
-graph LR
-A[SERVER] -- VotingID response ---> C(Topic: /registration/esp/UniqueID)
-C ---> D[ESP]
-```
 ## Setup
 Install mosquitto from https://mosquitto.org/download/ by following the official instructions. Once mosquitto is up and running on the machine simply run the code for the flask server on the machine. You can confirm if the flask server is setup by opening http://127.0.0.1:5000.
+
+## DB credentials.
+The credentials for the DB are expected to be defined in /isdProjectImports/credentials.py. The file code should look like this.
+´´´py
+dbUsername = ''
+dbPassword = ''
+dbHostname = ''
+dbPort = ''
+dbName = ''
+´´´
