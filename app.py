@@ -59,8 +59,9 @@ def handle_message(client, userdata, message):
         return # TODO: maybe add something to notify ESPs about failed JSON decode.
 
     # Handle received message based on topic.
-    print(f'starts with /registration/Server/: {receivedTopic.startswith("/registration/Server/")}')
+    
     if receivedTopic.startswith("/registration/Server/") == True:
+        print(f'starts with /registration/Server/: {receivedTopic.startswith("/registration/Server/")}')
         for i in range(len(esp.Esp.registeredESPs)):
             if esp.Esp.registeredESPs[i].macAddress == decodedMessage['Mac']:
                 print(f'{decodedMessage["Mac"]} ESP already registered.')
@@ -74,7 +75,19 @@ def handle_message(client, userdata, message):
         mqttImports.mqtt.subscribe(f'/registration/ESP/{esp.Esp.registeredESPs[-1].uniqueID}', qos=1) # Subscribe to ESP's uniqueID topic.
         return
 
-    
+    elif receivedTopic.startswith("/vote/") == True:
+        print(f'starts with /vote/: {receivedTopic.startswith("/vote/")}')
+
+        # Extract ESP ID from topic.
+        deviceID = receivedTopic.split("/")[2]
+        # Update vote in database.
+        if globalVoteInformation.voteEndTime > datetime.now() and globalVoteInformation.voteStartTime < datetime.now():
+            dbFunctions.update_vote(deviceID, decodedMessage['vote'])
+            return
+        else:
+            print('Vote not updated. Vote time not active.')
+            return
+
     return
 
 # API endpoints

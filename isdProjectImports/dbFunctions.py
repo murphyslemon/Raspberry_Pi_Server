@@ -386,5 +386,21 @@ def assign_user_to_esp(userID, espID):
         return False, str(errorMsg)
     
 
-# Add ESP to the database.
-
+# Update ESP and user vote.
+# Assumes vote time has been verified prior to calling this function.
+def update_vote(DeviceID, voteType):
+    try:
+        esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
+        
+        if esp.Assigned == True:
+            user = Users.query.filter_by(DeviceIndex=esp.DeviceIndex).first()
+            vote = Votes.query.filter_by(UserID=user.UserID).first()
+            vote.VoteType = voteType
+            db.session.commit()
+            return True, "Vote updated successfully."
+        else:
+            print("ESP not assigned.")
+            return False, "ESP not assigned."
+    except Exception as errorMsg:
+        print("Error: " + str(errorMsg))
+        return False, str(errorMsg)
