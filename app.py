@@ -70,6 +70,8 @@ def handle_message(client, userdata, message):
         esp.Esp(decodedMessage['Mac'])
         print(f'{decodedMessage["Mac"]} ESP registered.')
         esp.Esp.registeredESPs[-1].returnUniqueIDToEsp() # Sends uniqueID to ESP.
+
+        mqttImports.mqtt.subscribe(f'/registration/ESP/{esp.Esp.registeredESPs[-1].uniqueID}', qos=1) # Subscribe to ESP's uniqueID topic.
         return
 
     
@@ -126,6 +128,9 @@ def assignUserToESP():
     
     except:
         return jsonify({'message': 'Invalid data.'}), 400 # TODO: change return message to something more descriptive.
+
+
+
 
 
 if __name__ == '__main__':

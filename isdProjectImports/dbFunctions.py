@@ -284,7 +284,7 @@ def register_esp(mac_address):
             return True, registered_esp
 
         else:
-            return False, "ESP not found with the given macAddress"
+            return add_esp(mac_address)
 
     except Exception as errorMsg:
         return False, str(errorMsg)
@@ -384,3 +384,7 @@ def assign_user_to_esp(userID, espID):
 
     except Exception as errorMsg:
         return False, str(errorMsg)
+    
+
+# Add ESP to the database.
+
