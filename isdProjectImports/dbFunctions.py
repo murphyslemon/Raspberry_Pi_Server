@@ -281,13 +281,13 @@ def register_esp(mac_address):
 
             db.session.commit()
 
-            return True, registered_esp
+            return registered_esp, True
 
         else:
             return add_esp(mac_address)
 
     except Exception as errorMsg:
-        return False, str(errorMsg)
+        return str(errorMsg), False
 
 
 # Create a new ESP with the given macAddress.
@@ -299,13 +299,13 @@ def add_esp(mac_address):
 
         registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
 
-        return True, jsonify(registered_esp)
+        return registered_esp, True
 
     except Exception as errorMsg:
-        return False, str(errorMsg)
+        return str(errorMsg), False
 
 
-#Unregister specific ESP
+# Unregister specific ESP
 def unregister_esp(device_index):
     try:
         esp = RegisteredESPs.query.get(device_index)
@@ -313,12 +313,12 @@ def unregister_esp(device_index):
         if esp:
             esp.Registered = False
             db.session.commit()
-            return True, esp #TODO: return something else than esp
+            return esp, True #TODO: return something else than esp
         else:
-            return False, "ESP not found with the given DeviceIndex"
+            return "ESP not found with the given DeviceIndex", False
 
     except Exception as errorMsg:
-        return False, str(errorMsg)
+        return str(errorMsg), False
 
 
 # Unregister all ESPs.
@@ -331,10 +331,10 @@ def unregister_all_esps():
 
         db.session.commit()
 
-        return True, "All ESPs unregistered." #TODO: return something else.
+        return "All ESPs unregistered.", True #TODO: return something else.
 
     except Exception as errorMsg:
-        return False, str(errorMsg)
+        return str(errorMsg), False
     
 
 # POST new topic (vote) to the database.   
@@ -346,10 +346,10 @@ def create_topic(obj: voteHandling.VoteInformation):
 
         obj.topicID = topic.TopicID
 
-        return True, "Topic created successfully."
+        return "Topic created successfully.", True
 
     except Exception as errorMsg:
-        return False, str(errorMsg)
+        return str(errorMsg), False
 
 
 # Register user to ESP.
@@ -360,10 +360,10 @@ def create_user(username, deviceID):
         db.session.add(user)
         db.session.commit()
 
-        return True, "User created successfully."
+        return "User created successfully.", True
 
     except Exception as errorMsg:
-        return False, str(errorMsg)
+        return str(errorMsg), False
 
 
 # Assign user to ESP.
@@ -377,13 +377,13 @@ def assign_user_to_esp(userID, espID):
             esp.Assigned = True
             db.session.commit()
 
-            return True, "User assigned to ESP successfully."
+            return "User assigned to ESP successfully.", True
 
         else:
-            return False, "User or ESP not found."
+            return "User or ESP not found.", False
 
     except Exception as errorMsg:
-        return False, str(errorMsg)
+        return str(errorMsg), False
     
 
 # Update ESP and user vote.
@@ -397,10 +397,10 @@ def update_vote(DeviceID, voteType):
             vote = Votes.query.filter_by(UserID=user.UserID).first()
             vote.VoteType = voteType
             db.session.commit()
-            return True, "Vote updated successfully."
+            return "Vote updated successfully.", True
         else:
             print("ESP not assigned.")
-            return False, "ESP not assigned."
+            return "ESP not assigned.", False
     except Exception as errorMsg:
         print("Error: " + str(errorMsg))
-        return False, str(errorMsg)
+        return str(errorMsg), False

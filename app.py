@@ -8,7 +8,6 @@ from isdProjectImports import credentials
 from isdProjectImports import mqttImports
 from isdProjectImports import dbFunctions
 from isdProjectImports import voteHandling
-from isdProjectImports import esp
 
 mqttBrokerPort = 1883
 mqttKeepAliveSec = 10
@@ -31,6 +30,7 @@ app.config['MQTT_TLS_ENABLED'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{credentials.dbUsername}:{credentials.dbPassword}@{credentials.dbHostname}:{credentials.dbPort}/{credentials.dbName}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Only for confirming that server is running.
 @app.route('/')
 def index():
     return 'Flask MQTT Server is running!'
@@ -41,8 +41,11 @@ def handle_connect(client, userdata, flags, rc):
    if rc == 0:
        for topic in mqttImports.initialSubscribeTopics:
            mqttImports.mqtt.subscribe(topic, qos=1)  # subscribe to each topic
+           with open('log.txt', 'a') as logFile:
+               logFile.write(f'{datetime.now()}: mqtt.on_connect(), subscribed to topic: {topic}\n')
    else:
-       print(f'Connection failed. Code: {rc}')
+       with open('log.txt', 'a') as logFile:
+           logFile.write(f'{datetime.now()}: mqtt.on_connect(), connection failed\n')
 
 
 # MQTT message handling
@@ -50,45 +53,61 @@ def handle_connect(client, userdata, flags, rc):
 def handle_message(client, userdata, message):
     receivedMessage = message.payload.decode("utf-8")
     receivedTopic = message.topic
-    print(f'Received message: {receivedMessage} on topic: {receivedTopic}')
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: mqtt.on_message(), received message: {receivedMessage} on topic: {receivedTopic}\n')
 
     # Decode JSON message.
     decodedMessage = mqttImports.decodeStringToJSON(receivedMessage)
     if decodedMessage == -1:
-        print('JSON decode failed.')
+        with open('log.txt', 'a') as logFile:
+            logFile.write(f'{datetime.now()}: mqtt.on_message(), JSON decode failed\n')
         return # TODO: maybe add something to notify ESPs about failed JSON decode.
 
     # Handle received message based on topic.
     
     if receivedTopic.startswith("/registration/Server/") == True:
-        print(f'starts with /registration/Server/: {receivedTopic.startswith("/registration/Server/")}')
-        for i in range(len(esp.Esp.registeredESPs)):
-            if esp.Esp.registeredESPs[i].macAddress == decodedMessage['Mac']:
-                print(f'{decodedMessage["Mac"]} ESP already registered.')
-                esp.Esp.registeredESPs[i].returnUniqueIDToEsp() # Resends uniqueID to ESP.
-                return
-            
-        esp.Esp(decodedMessage['Mac'])
-        print(f'{decodedMessage["Mac"]} ESP registered.')
-        esp.Esp.registeredESPs[-1].returnUniqueIDToEsp() # Sends uniqueID to ESP.
+        with open('log.txt', 'a') as logFile:
+            logFile.write(f'{datetime.now()}: mqtt.on_message(), received message on /registration/Server/\n')
 
-        mqttImports.mqtt.subscribe(f'/registration/ESP/{esp.Esp.registeredESPs[-1].uniqueID}', qos=1) # Subscribe to ESP's uniqueID topic.
-        return
+        # Extract ESP MAC address from topic.
+        macAddress = receivedTopic.split("/")[3]
+
+        # Register ESP in database.
+        registeredESP, registrationStatus = dbFunctions.register_esp(macAddress)
+
+        if registrationStatus == True:
+            # return uniqueID to ESP.
+            mqttImports.mqtt.publish(f'/registration/esp/{macAddress}', f'{{"VotingID":"{registeredESP.uniqueID}"}}', qos=1)
+            mqttImports.mqtt.subscribe(f'/registration/ESP/{registeredESP.uniqueID}', qos=1) # Subscribe to ESP's uniqueID topic.
+
+            with open('log.txt', 'a') as logFile:
+                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP registration successful\n')
+                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP uniqueID: {registeredESP.uniqueID}\n')
+                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP MAC address: {registeredESP.macAddress}\n')
+
+        else:
+            #TODO: add something to notify ESP about failed registration.
+            with open('log.txt', 'a') as logFile:
+                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP registration failed\n')
+
+        return # Exit function.
 
     elif receivedTopic.startswith("/vote/") == True:
-        print(f'starts with /vote/: {receivedTopic.startswith("/vote/")}')
+        with open('log.txt', 'a') as logFile:
+            logFile.write(f'{datetime.now()}: mqtt.on_message(), received message on /vote/\n')
 
         # Extract ESP ID from topic.
         deviceID = receivedTopic.split("/")[2]
         # Update vote in database.
         if globalVoteInformation.voteEndTime > datetime.now() and globalVoteInformation.voteStartTime < datetime.now():
             dbFunctions.update_vote(deviceID, decodedMessage['vote'])
-            return
+            
         else:
-            print('Vote not updated. Vote time not active.')
-            return
+            with open('log.txt', 'a') as logFile:
+                logFile.write(f'{datetime.now()}: mqtt.on_message(), vote not updated, vote is not active\n')
+            
 
-    return
+    return # Exit function.
 
 # API endpoints
 
@@ -152,3 +171,7 @@ if __name__ == '__main__':
     mqttImports.mqtt.init_app(app)
 
     app.run(host='0.0.0.0', port=5000, use_reloader=False)
+
+    # Log DB boot info to log file.
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Server started.\n')
