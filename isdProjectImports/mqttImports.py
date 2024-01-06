@@ -1,6 +1,7 @@
 from flask_mqtt import Mqtt
 import json
 import random
+from datetime import datetime
 
 mqttBrokerPort = 1883
 mqttKeepAliveSec = 10
@@ -25,10 +26,10 @@ initialSubscribeTopics = [registrationIncomingTopic, voteResyncTopic, voteIncomi
 def decodeStringToJSON(json_string):
     try:
         decodedMessage = json.loads(json_string)
-        print('JSON test passed.')
         return decodedMessage
     except json.decoder.JSONDecodeError as error:
-        print(f'JSON test failed. Error: {error}')
+        with open('log.txt', 'a') as logFile:
+            logFile.write(f'{datetime.now()}: decodeStringToJSON(), JSONDecodeError: {error}\n')
         return -1
 
 
@@ -57,7 +58,9 @@ def publishJSONtoMQTT(topic, message):
     try:
         mqtt.publish(topic, message, qos=mqttQoSLevel)
     except:
-        print(f'Failed to publish message: {str(message)}\nto topic: {topic}')
+        
+        with open('log.txt', 'a') as logFile:
+            logFile.write(f'{datetime.now()}: publishJSONtoMQTT(), Failed to publish message: {str(message)}to topic: {topic}\n')
         return False
     else:
         return True
