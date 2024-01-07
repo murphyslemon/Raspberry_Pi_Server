@@ -75,19 +75,16 @@ def handle_message(client, userdata, message):
         # Register ESP in database.
         # Inside mqtt.on_message() in app.py
         registeredESP, registrationStatus = dbFunctions.register_esp(app, macAddress)
-        with open('log.txt', 'a') as logFile: #TODO: remove this.
-            logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP registration status: {registrationStatus}\n')
-            logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP : {registeredESP}\n')
 
         if registrationStatus == True:
             # return uniqueID to ESP.
-            mqttImports.mqtt.publish(f'/registration/esp/{macAddress}', f'{{"VotingID":"{registeredESP.uniqueID}"}}', qos=1)
-            mqttImports.mqtt.subscribe(f'/registration/ESP/{registeredESP.uniqueID}', qos=1) # Subscribe to ESP's uniqueID topic.
+            mqttImports.mqtt.publish(f'/registration/esp/{macAddress}', f'{{"VotingID":"{registeredESP.DeviceID}"}}', qos=1)
+            mqttImports.mqtt.subscribe(f'/registration/ESP/{registeredESP.DeviceID}', qos=1) # Subscribe to ESP's uniqueID topic.
 
             with open('log.txt', 'a') as logFile:
                 logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP registration successful\n')
-                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP uniqueID: {registeredESP.uniqueID}\n')
-                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP MAC address: {registeredESP.macAddress}\n')
+                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP uniqueID: {registeredESP.DeviceID}\n')
+                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP MAC address: {registeredESP.MacAddress}\n')
 
         else:
             #TODO: add something to notify ESP about failed registration.
