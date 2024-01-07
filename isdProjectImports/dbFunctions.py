@@ -302,6 +302,7 @@ def insert_data(app):
     
 
 # Function to register an ESP by updating its DeviceID and Registered status
+# Function to register an ESP by updating its DeviceID and Registered status
 def register_esp(app, mac_address):
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.register_esp()\n')
@@ -317,16 +318,8 @@ def register_esp(app, mac_address):
 
                 db.session.commit()
 
-                # Return JSON object containing ESP data
-                return {
-                    "DeviceIndex": registered_esp.DeviceIndex,
-                    "DeviceID": registered_esp.DeviceID,
-                    "RegistrationTime": str(registered_esp.RegistrationTime),
-                    "LastActiveTime": str(registered_esp.LastActiveTime),
-                    "Assigned": registered_esp.Assigned,
-                    "Registered": registered_esp.Registered,
-                    "MacAddress": registered_esp.MacAddress
-                }, True
+                # Return the instance of RegisteredESPs
+                return registered_esp, True
 
             else:
                 with open('log.txt', 'a') as logFile:
@@ -342,7 +335,6 @@ def add_esp(app, mac_address):
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.add_esp()\n')
 
-    
     try:
         with app.app_context():
             add_esp = RegisteredESPs(MacAddress=mac_address, Registered=True, DeviceID=str(uuid.uuid4()))
@@ -351,20 +343,11 @@ def add_esp(app, mac_address):
 
             registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
 
-            # Return JSON object containing ESP data
-            return jsonify({
-                "DeviceIndex": registered_esp.DeviceIndex,
-                "DeviceID": registered_esp.DeviceID,
-                "RegistrationTime": str(registered_esp.RegistrationTime),
-                "LastActiveTime": str(registered_esp.LastActiveTime),
-                "Assigned": registered_esp.Assigned,
-                "Registered": registered_esp.Registered,
-                "MacAddress": registered_esp.MacAddress
-            }), True
+            # Return the instance of RegisteredESPs
+            return registered_esp, True
 
     except Exception as errorMsg:
         return str(errorMsg), False
-
 
 
 # Unregister specific ESP
