@@ -54,7 +54,7 @@ def get_registered_esps(app):
             registered_esps_with_users = (
                 db.session.query(RegisteredESPs, Users)
                 .join(Users, RegisteredESPs.DeviceIndex == Users.DeviceIndex)
-                .filter(RegisteredESPs.Registered == True)
+                .filter(RegisteredESPs.Registered == 1)
                 .all()
             )
 
