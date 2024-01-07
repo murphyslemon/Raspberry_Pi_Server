@@ -151,7 +151,7 @@ def createTopic():
     except Exception as errorMsg:
         with open('log.txt', 'a') as logFile:
             logFile.write(f'{datetime.now()}: createTopic(), Error: {errorMsg}\n')
-        return jsonify({'Error message':{errorMsg}}), 500
+        return 500
 
 
 # Assign user to ESP.
