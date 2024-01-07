@@ -54,9 +54,11 @@ def get_registered_esps(app):
             registered_esps_with_users = (
                 db.session.query(RegisteredESPs, Users)
                 .join(Users, RegisteredESPs.DeviceIndex == Users.DeviceIndex)
-                .filter(RegisteredESPs.Registered == 1)
+                .filter(RegisteredESPs.Registered == True)
                 .all()
             )
+
+            print(registered_esps_with_users)
 
             esp_data = defaultdict(lambda: {"Users": []})
 
