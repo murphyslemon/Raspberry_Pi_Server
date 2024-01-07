@@ -46,6 +46,9 @@ class Votes(db.Model):
 
 # GET all registered ESPs from the database.
 def get_registered_esps(app):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.get_registered_esps()\n')
+
     try:
         with app.app_context():
             registered_esps_with_users = (
@@ -88,6 +91,9 @@ def get_registered_esps(app):
 
 # GET all Esps from the database.
 def get_all_esps(app):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.get_all_esps()\n')
+
     try:
         with app.app_context():
             registered_esps = RegisteredESPs.query.all()
@@ -114,6 +120,9 @@ def get_all_esps(app):
 
 # GET all topics (votes) from the database.
 def get_all_topics(app):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.get_all_topics()\n')
+
     try:
         with app.app_context():
             topics = Topics.query.all()
@@ -138,6 +147,9 @@ def get_all_topics(app):
 
 # GET topic (vote) based on topicID from the database.
 def get_topic(app, topicID):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.get_topic()\n')
+
     try:
         with app.app_context():
             topic = Topics.query.filter_by(TopicID=topicID).first()
@@ -159,6 +171,9 @@ def get_topic(app, topicID):
 
 # GET all votes from the database based on topicID.
 def get_votes(app, topicID):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.get_votes()\n')
+
     try:
         with app.app_context():
             votes = Votes.query.filter_by(TopicID=topicID).all()
@@ -183,6 +198,9 @@ def get_votes(app, topicID):
 
 # GET all votes from the database based on userID.
 def get_votes_by_user(app, userID):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.get_votes_by_user()\n')
+
     try:
         with app.app_context():
             votes = Votes.query.filter_by(UserID=userID).all()
@@ -281,10 +299,13 @@ def insert_data(app):
     except Exception as errorMsg:
         error_message = {"error": str(errorMsg)}
         return jsonify(error_message), 500
+    
 
-
-# Modify the deviceid and registered status of an existing ESP with the given macAddress.
+# Function to register an ESP by updating its DeviceID and Registered status
 def register_esp(app, mac_address):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.register_esp()\n')
+
     try:
         with app.app_context():
             registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
@@ -296,7 +317,16 @@ def register_esp(app, mac_address):
 
                 db.session.commit()
 
-                return registered_esp, True
+                # Return JSON object containing ESP data
+                return jsonify({
+                    "DeviceIndex": registered_esp.DeviceIndex,
+                    "DeviceID": registered_esp.DeviceID,
+                    "RegistrationTime": str(registered_esp.RegistrationTime),
+                    "LastActiveTime": str(registered_esp.LastActiveTime),
+                    "Assigned": registered_esp.Assigned,
+                    "Registered": registered_esp.Registered,
+                    "MacAddress": registered_esp.MacAddress
+                }), True
 
             else:
                 with open('log.txt', 'a') as logFile:
@@ -307,8 +337,12 @@ def register_esp(app, mac_address):
         return str(errorMsg), False
 
 
-# Create a new ESP with the given macAddress.
+# Function to add a new ESP to the database
 def add_esp(app, mac_address):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.add_esp()\n')
+
+    
     try:
         with app.app_context():
             add_esp = RegisteredESPs(MacAddress=mac_address, Registered=True, DeviceID=str(uuid.uuid4()))
@@ -317,14 +351,27 @@ def add_esp(app, mac_address):
 
             registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
 
-            return registered_esp, True
+            # Return JSON object containing ESP data
+            return jsonify({
+                "DeviceIndex": registered_esp.DeviceIndex,
+                "DeviceID": registered_esp.DeviceID,
+                "RegistrationTime": str(registered_esp.RegistrationTime),
+                "LastActiveTime": str(registered_esp.LastActiveTime),
+                "Assigned": registered_esp.Assigned,
+                "Registered": registered_esp.Registered,
+                "MacAddress": registered_esp.MacAddress
+            }), True
 
     except Exception as errorMsg:
         return str(errorMsg), False
 
 
+
 # Unregister specific ESP
-def unregister_esp(app, device_index):
+def unregister_esp(app, device_index): 
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.unregister_esp()\n')
+
     try:
         with app.app_context():
             esp = RegisteredESPs.query.get(device_index)
@@ -342,6 +389,9 @@ def unregister_esp(app, device_index):
 
 # Unregister all ESPs.
 def unregister_all_esps(app):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.unregister_all_esps()\n')
+
     try:
         with app.app_context():
             registered_esps = RegisteredESPs.query.all()
@@ -359,6 +409,9 @@ def unregister_all_esps(app):
 
 # POST new topic (vote) to the database.   
 def create_topic(app, obj: voteHandling.VoteInformation):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.create_topic()\n')
+
     try:
         with app.app_context():
             topic = Topics(Title=obj.title, Description=obj.description, StartTime=obj.voteStartTime, EndTime=obj.voteEndTime)
@@ -376,6 +429,9 @@ def create_topic(app, obj: voteHandling.VoteInformation):
 # Register user to ESP.
 # Create a new user in the database.
 def create_user(app, username, deviceID):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.create_user()\n')
+
     try:
         with app.app_context():
             user = Users(Username=username, DeviceIndex=deviceID)
@@ -390,6 +446,9 @@ def create_user(app, username, deviceID):
 
 # Assign user to ESP.
 def assign_user_to_esp(app, userID, espID):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.assign_user_to_esp()\n')
+
     try:
         with app.app_context():
             user = Users.query.get(userID)
@@ -412,6 +471,9 @@ def assign_user_to_esp(app, userID, espID):
 # Update ESP and user vote.
 # Assumes vote time has been verified prior to calling this function.
 def update_vote(app, DeviceID, voteType):
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.update_vote()\n')
+        
     try:
         with app.app_context():
             esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
