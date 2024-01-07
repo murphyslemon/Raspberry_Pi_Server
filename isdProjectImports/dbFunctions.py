@@ -57,8 +57,6 @@ def get_registered_esps(app):
                 .all()
             )
 
-            print(registered_esps)
-
             esp_data = defaultdict(lambda: {})
 
             for esp in registered_esps:
