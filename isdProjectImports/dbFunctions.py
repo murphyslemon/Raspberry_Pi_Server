@@ -318,7 +318,7 @@ def register_esp(app, mac_address):
                 db.session.commit()
 
                 # Return JSON object containing ESP data
-                return jsonify({
+                return {
                     "DeviceIndex": registered_esp.DeviceIndex,
                     "DeviceID": registered_esp.DeviceID,
                     "RegistrationTime": str(registered_esp.RegistrationTime),
@@ -326,7 +326,7 @@ def register_esp(app, mac_address):
                     "Assigned": registered_esp.Assigned,
                     "Registered": registered_esp.Registered,
                     "MacAddress": registered_esp.MacAddress
-                }), True
+                }, True
 
             else:
                 with open('log.txt', 'a') as logFile:
@@ -473,7 +473,7 @@ def assign_user_to_esp(app, userID, espID):
 def update_vote(app, DeviceID, voteType):
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.update_vote()\n')
-        
+
     try:
         with app.app_context():
             esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
