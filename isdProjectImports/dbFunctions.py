@@ -53,7 +53,7 @@ def get_registered_esps(app):
         with app.app_context():
             registered_esps = (
                 db.session.query(RegisteredESPs)
-                .filter(RegisteredESPs.Registered == True, RegisteredESPs.Assigned == False)
+                .filter(RegisteredESPs.Registered == True)
                 .all()
             )
 
