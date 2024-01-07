@@ -78,13 +78,13 @@ def handle_message(client, userdata, message):
 
         if registrationStatus == True:
             # return uniqueID to ESP.
-            mqttImports.mqtt.publish(f'/registration/esp/{macAddress}', f'{{"VotingID":"{registeredESP[DeviceID]}"}}', qos=1)
-            mqttImports.mqtt.subscribe(f'/registration/ESP/{registeredESP[DeviceID]}', qos=1) # Subscribe to ESP's uniqueID topic.
+            mqttImports.mqtt.publish(f'/registration/esp/{macAddress}', f'{{"VotingID":"{registeredESP.DeviceID}"}}', qos=1)
+            mqttImports.mqtt.subscribe(f'/registration/ESP/{registeredESP.DeviceID}', qos=1) # Subscribe to ESP's uniqueID topic.
 
             with open('log.txt', 'a') as logFile:
                 logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP registration successful\n')
-                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP uniqueID: {registeredESP[DeviceID]}\n')
-                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP MAC address: {registeredESP[MacAddress]}\n')
+                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP uniqueID: {registeredESP.DeviceID}\n')
+                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP MAC address: {registeredESP.MacAddress}\n')
 
         else:
             #TODO: add something to notify ESP about failed registration.
