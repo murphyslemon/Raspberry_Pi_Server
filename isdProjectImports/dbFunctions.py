@@ -299,6 +299,8 @@ def register_esp(app, mac_address):
                 return registered_esp, True
 
             else:
+                with open('log.txt', 'a') as logFile:
+                    logFile.write(f'{datetime.now()}: dbFunctions.register_esp(), ESP not found with the given MacAddress\n')
                 return add_esp(app, mac_address)
 
     except Exception as errorMsg:
