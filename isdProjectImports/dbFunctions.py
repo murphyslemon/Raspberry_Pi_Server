@@ -311,7 +311,7 @@ def register_esp(app, mac_address):
 def add_esp(app, mac_address):
     try:
         with app.app_context():
-            add_esp = RegisteredESPs(MacAddress=mac_address)
+            add_esp = RegisteredESPs(MacAddress=mac_address, Registered=True, DeviceID=str(uuid.uuid4()))
             db.session.add(add_esp)
             db.session.commit()
 
