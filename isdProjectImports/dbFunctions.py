@@ -45,40 +45,41 @@ class Votes(db.Model):
 
 
 # GET all registered ESPs from the database.
-def get_registered_esps():
+def get_registered_esps(app):
     try:
-        registered_esps_with_users = (
-            db.session.query(RegisteredESPs, Users)
-            .join(Users, RegisteredESPs.DeviceIndex == Users.DeviceIndex)
-            .filter(RegisteredESPs.Registered == True)
-            .all()
-        )
+        with app.app_context():
+            registered_esps_with_users = (
+                db.session.query(RegisteredESPs, Users)
+                .join(Users, RegisteredESPs.DeviceIndex == Users.DeviceIndex)
+                .filter(RegisteredESPs.Registered == True)
+                .all()
+            )
 
-        esp_data = defaultdict(lambda: {"Users": []})
+            esp_data = defaultdict(lambda: {"Users": []})
 
-        for esp, user in registered_esps_with_users:
-            esp_data[esp.DeviceIndex].update({
-                "DeviceIndex": esp.DeviceIndex,
-                "DeviceID": esp.DeviceID,
-                "RegistrationTime": str(esp.RegistrationTime),
-                "LastActiveTime": str(esp.LastActiveTime),
-                "Assigned": esp.Assigned,
-                "Registered": esp.Registered,
-                "MacAddress": esp.MacAddress,
-            })
+            for esp, user in registered_esps_with_users:
+                esp_data[esp.DeviceIndex].update({
+                    "DeviceIndex": esp.DeviceIndex,
+                    "DeviceID": esp.DeviceID,
+                    "RegistrationTime": str(esp.RegistrationTime),
+                    "LastActiveTime": str(esp.LastActiveTime),
+                    "Assigned": esp.Assigned,
+                    "Registered": esp.Registered,
+                    "MacAddress": esp.MacAddress,
+                })
 
-            user_info = {
-                "UserID": user.UserID,
-                "Username": user.Username,
-                "RegistrationDate": str(user.RegistrationDate),
-                "DeviceIndex": user.DeviceIndex
-            }
+                user_info = {
+                    "UserID": user.UserID,
+                    "Username": user.Username,
+                    "RegistrationDate": str(user.RegistrationDate),
+                    "DeviceIndex": user.DeviceIndex
+                }
 
-            esp_data[esp.DeviceIndex]["Users"].append(user_info)
+                esp_data[esp.DeviceIndex]["Users"].append(user_info)
 
-        esp_data_list = list(esp_data.values())
+            esp_data_list = list(esp_data.values())
 
-        return jsonify(esp_data_list)
+            return jsonify(esp_data_list)
 
     except Exception as errorMsg:
         error_message = {"error": str(errorMsg)}
@@ -86,24 +87,25 @@ def get_registered_esps():
 
 
 # GET all Esps from the database.
-def get_all_esps():
+def get_all_esps(app):
     try:
-        registered_esps = RegisteredESPs.query.all()
-        esp_data_list = []
+        with app.app_context():
+            registered_esps = RegisteredESPs.query.all()
+            esp_data_list = []
 
-        for esp in registered_esps:
-            esp_data = {
-                "DeviceIndex": esp.DeviceIndex,
-                "DeviceID": esp.DeviceID,
-                "RegistrationTime": str(esp.RegistrationTime),
-                "LastActiveTime": str(esp.LastActiveTime),
-                "Assigned": esp.Assigned,
-                "Registered": esp.Registered,
-                "MacAddress": esp.MacAddress
-            }
-            esp_data_list.append(esp_data)
+            for esp in registered_esps:
+                esp_data = {
+                    "DeviceIndex": esp.DeviceIndex,
+                    "DeviceID": esp.DeviceID,
+                    "RegistrationTime": str(esp.RegistrationTime),
+                    "LastActiveTime": str(esp.LastActiveTime),
+                    "Assigned": esp.Assigned,
+                    "Registered": esp.Registered,
+                    "MacAddress": esp.MacAddress
+                }
+                esp_data_list.append(esp_data)
 
-        return jsonify(esp_data_list)
+            return jsonify(esp_data_list)
 
     except Exception as errorMsg:
         error_message = {"error": str(errorMsg)}
@@ -111,22 +113,23 @@ def get_all_esps():
 
 
 # GET all topics (votes) from the database.
-def get_all_topics():
+def get_all_topics(app):
     try:
-        topics = Topics.query.all()
-        topic_data_list = []
+        with app.app_context():
+            topics = Topics.query.all()
+            topic_data_list = []
 
-        for topic in topics:
-            topic_data = {
-                "TopicID": topic.TopicID,
-                "Title": topic.Title,
-                "Description": topic.Description,
-                "StartTime": str(topic.StartTime),
-                "EndTime": str(topic.EndTime)
-            }
-            topic_data_list.append(topic_data)
+            for topic in topics:
+                topic_data = {
+                    "TopicID": topic.TopicID,
+                    "Title": topic.Title,
+                    "Description": topic.Description,
+                    "StartTime": str(topic.StartTime),
+                    "EndTime": str(topic.EndTime)
+                }
+                topic_data_list.append(topic_data)
 
-        return jsonify(topic_data_list)
+            return jsonify(topic_data_list)
 
     except Exception as errorMsg:
         error_message = {"error": str(errorMsg)}
@@ -270,21 +273,22 @@ def insert_data():
 
 
 # Modify the deviceid and registered status of an existing ESP with the given macAddress.
-def register_esp(mac_address):
+def register_esp(app, mac_address):
     try:
-        registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
+        with app.app_context():
+            registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
 
-        if registered_esp:
-            device_id = str(uuid.uuid4())
-            registered_esp.DeviceID = device_id
-            registered_esp.Registered = True
+            if registered_esp:
+                device_id = str(uuid.uuid4())
+                registered_esp.DeviceID = device_id
+                registered_esp.Registered = True
 
-            db.session.commit()
+                db.session.commit()
 
-            return registered_esp, True
+                return registered_esp, True
 
-        else:
-            return add_esp(mac_address)
+            else:
+                return add_esp(app, mac_address)
 
     except Exception as errorMsg:
         return str(errorMsg), False

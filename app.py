@@ -73,8 +73,9 @@ def handle_message(client, userdata, message):
         macAddress = receivedTopic.split("/")[3]
 
         # Register ESP in database.
-        registeredESP, registrationStatus = dbFunctions.register_esp(macAddress)
-        with open('log.txt', 'a') as logFile:
+        # Inside mqtt.on_message() in app.py
+        registeredESP, registrationStatus = dbFunctions.register_esp(app, macAddress)
+        with open('log.txt', 'a') as logFile: #TODO: remove this.
             logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP registration status: {registrationStatus}\n')
             logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP : {registeredESP}\n')
 
@@ -117,7 +118,7 @@ def handle_message(client, userdata, message):
 # GET all registered ESPs.
 @app.route('/api/getRegisteredESPs', methods=['GET'])
 def getRegisteredESPs():
-    return dbFunctions.get_registered_esps()
+    return dbFunctions.get_registered_esps(app)
 
 
 # GET all Topics (votes).
