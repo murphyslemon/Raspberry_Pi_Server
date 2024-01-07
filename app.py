@@ -74,6 +74,8 @@ def handle_message(client, userdata, message):
 
         # Register ESP in database.
         registeredESP, registrationStatus = dbFunctions.register_esp(macAddress)
+        with open('log.txt', 'a') as logFile:
+            logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP registration status: {registrationStatus}\n')
 
         if registrationStatus == True:
             # return uniqueID to ESP.
