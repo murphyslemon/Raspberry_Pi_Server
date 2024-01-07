@@ -392,10 +392,12 @@ def create_topic(app, obj: voteHandling.VoteInformation):
 
             obj.topicID = topic.TopicID
 
-            return "Topic created successfully.", True
+            return  True
 
     except Exception as errorMsg:
-        return str(errorMsg), False
+        with open('log.txt', 'a') as logFile:
+            logFile.write(f'{datetime.now()}: dbFunctions.create_topic(), {str(errorMsg)}\n')
+        return False
 
 
 # Register user to ESP.
