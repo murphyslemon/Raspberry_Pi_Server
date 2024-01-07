@@ -137,21 +137,21 @@ def createTopic():
         if mqttImports.validateKeywordsInJSON(data, ['Title', 'Description', 'StartTime', 'EndTime'], 1) == False:
             with open('log.txt', 'a') as logFile:
                 logFile.write(f'{datetime.now()}: createTopic(), Invalid request.\n')
-            return 400
+            return jsonify({'message': 'Invalid request.'}), 400
 
         globalVoteInformation.updateVoteInformation(data['Title'], data['Description'], data['StartTime'], data['EndTime'])
 
         # Create new topic in database.
         if dbFunctions.create_topic(app, globalVoteInformation) == True:
             # TODO: figure out voteStartTiming.
-            return 200
+            return jsonify({'message': 'Topic created successfully.'}), 200
         else:
             return jsonify({'message': 'Topic creation failed.'}), 400
 
     except Exception as errorMsg:
         with open('log.txt', 'a') as logFile:
             logFile.write(f'{datetime.now()}: createTopic(), Error: {errorMsg}\n')
-        return 500
+        return jsonify({'message': 'Internal server error.'}), 500
 
 
 # Assign user to ESP.
