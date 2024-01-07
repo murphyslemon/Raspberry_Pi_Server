@@ -52,9 +52,8 @@ def get_registered_esps(app):
     try:
         with app.app_context():
             registered_esps_with_users = (
-                db.session.query(RegisteredESPs, Users)
-                .join(Users, RegisteredESPs.DeviceIndex == Users.DeviceIndex)
-                .filter(RegisteredESPs.Registered == True)
+                db.session.query(RegisteredESPs)
+                .filter(RegisteredESPs.Registered == True, RegisteredESPs.Assigned == False)
                 .all()
             )
 
@@ -62,7 +61,7 @@ def get_registered_esps(app):
 
             esp_data = defaultdict(lambda: {"Users": []})
 
-            for esp, user in registered_esps_with_users:
+            for esp in registered_esps_with_users:
                 esp_data[esp.DeviceIndex].update({
                     "DeviceIndex": esp.DeviceIndex,
                     "DeviceID": esp.DeviceID,
@@ -72,15 +71,6 @@ def get_registered_esps(app):
                     "Registered": esp.Registered,
                     "MacAddress": esp.MacAddress,
                 })
-
-                user_info = {
-                    "UserID": user.UserID,
-                    "Username": user.Username,
-                    "RegistrationDate": str(user.RegistrationDate),
-                    "DeviceIndex": user.DeviceIndex
-                }
-
-                esp_data[esp.DeviceIndex]["Users"].append(user_info)
 
             esp_data_list = list(esp_data.values())
 
