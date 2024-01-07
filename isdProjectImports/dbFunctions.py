@@ -137,19 +137,20 @@ def get_all_topics(app):
 
 
 # GET topic (vote) based on topicID from the database.
-def get_topic(topicID):
+def get_topic(app, topicID):
     try:
-        topic = Topics.query.filter_by(TopicID=topicID).first()
+        with app.app_context():
+            topic = Topics.query.filter_by(TopicID=topicID).first()
 
-        topic_data = {
-            "TopicID": topic.TopicID,
-            "Title": topic.Title,
-            "Description": topic.Description,
-            "StartTime": str(topic.StartTime),
-            "EndTime": str(topic.EndTime)
-        }
+            topic_data = {
+                "TopicID": topic.TopicID,
+                "Title": topic.Title,
+                "Description": topic.Description,
+                "StartTime": str(topic.StartTime),
+                "EndTime": str(topic.EndTime)
+            }
 
-        return jsonify(topic_data)
+            return jsonify(topic_data)
 
     except Exception as errorMsg:
         error_message = {"error": str(errorMsg)}
@@ -157,22 +158,23 @@ def get_topic(topicID):
 
 
 # GET all votes from the database based on topicID.
-def get_votes(topicID):
+def get_votes(app, topicID):
     try:
-        votes = Votes.query.filter_by(TopicID=topicID).all()
-        vote_data_list = []
+        with app.app_context():
+            votes = Votes.query.filter_by(TopicID=topicID).all()
+            vote_data_list = []
 
-        for vote in votes:
-            vote_data = {
-                "VoteID": vote.VoteID,
-                "UserID": vote.UserID,
-                "VoteType": vote.VoteType,
-                "TopicID": vote.TopicID,
-                "VoteTime": str(vote.VoteTime)
-            }
-            vote_data_list.append(vote_data)
+            for vote in votes:
+                vote_data = {
+                    "VoteID": vote.VoteID,
+                    "UserID": vote.UserID,
+                    "VoteType": vote.VoteType,
+                    "TopicID": vote.TopicID,
+                    "VoteTime": str(vote.VoteTime)
+                }
+                vote_data_list.append(vote_data)
 
-        return jsonify(vote_data_list)
+            return jsonify(vote_data_list)
 
     except Exception as errorMsg:
         error_message = {"error": str(errorMsg)}
@@ -180,22 +182,23 @@ def get_votes(topicID):
     
 
 # GET all votes from the database based on userID.
-def get_votes_by_user(userID):
+def get_votes_by_user(app, userID):
     try:
-        votes = Votes.query.filter_by(UserID=userID).all()
-        vote_data_list = []
+        with app.app_context():
+            votes = Votes.query.filter_by(UserID=userID).all()
+            vote_data_list = []
 
-        for vote in votes:
-            vote_data = {
-                "VoteID": vote.VoteID,
-                "UserID": vote.UserID,
-                "VoteType": vote.VoteType,
-                "TopicID": vote.TopicID,
-                "VoteTime": str(vote.VoteTime)
-            }
-            vote_data_list.append(vote_data)
+            for vote in votes:
+                vote_data = {
+                    "VoteID": vote.VoteID,
+                    "UserID": vote.UserID,
+                    "VoteType": vote.VoteType,
+                    "TopicID": vote.TopicID,
+                    "VoteTime": str(vote.VoteTime)
+                }
+                vote_data_list.append(vote_data)
 
-        return jsonify(vote_data_list)
+            return jsonify(vote_data_list)
 
     except Exception as errorMsg:
         error_message = {"error": str(errorMsg)}
@@ -204,14 +207,15 @@ def get_votes_by_user(userID):
 
 # Removes all data from the database.
 # DEBUG ONLY
-def clear_database():
+def clear_database(app):
     try:
-        db.session.query(RegisteredESPs).delete()
-        db.session.query(Users).delete()
-        db.session.query(Topics).delete()
-        db.session.query(Votes).delete()
-        db.session.commit()
-        return jsonify("Database cleared.")
+        with app.app_context():
+            db.session.query(RegisteredESPs).delete()
+            db.session.query(Users).delete()
+            db.session.query(Topics).delete()
+            db.session.query(Votes).delete()
+            db.session.commit()
+            return jsonify("Database cleared.")
 
     except Exception as errorMsg:
         error_message = {"error": str(errorMsg)}
@@ -220,52 +224,59 @@ def clear_database():
 
 # Initializes the database.
 # DEBUG ONLY
-def init_db():
-    db.create_all()
-    db.session.commit()
-    return jsonify("Database initialized.")
+def init_db(app):
+    try:
+        with app.app_context():
+            db.create_all()
+            db.session.commit()
+            return jsonify("Database initialized.")
+
+    except Exception as errorMsg:
+        error_message = {"error": str(errorMsg)}
+        return jsonify(error_message), 500
 
 
 # Inserts test data into the database.
 # DEBUG ONLY
-def insert_data():
+def insert_data(app):
     try:
-        registered_esps_data = [
-            {'DeviceIndex': 1, 'DeviceID': 'ESP001', 'Assigned': True, 'Registered': True, 'MacAddress': '00:11:22:33:44:55'},
-            {'DeviceIndex': 2, 'DeviceID': 'ESP002', 'Assigned': False, 'Registered': True, 'MacAddress': 'AA:BB:CC:DD:EE:FF'}
-        ]
-        for data in registered_esps_data:
-            registered_esp = RegisteredESPs(**data)
-            db.session.add(registered_esp)
+        with app.app_context():
+            registered_esps_data = [
+                {'DeviceIndex': 1, 'DeviceID': 'ESP001', 'Assigned': True, 'Registered': True, 'MacAddress': '00:11:22:33:44:55'},
+                {'DeviceIndex': 2, 'DeviceID': 'ESP002', 'Assigned': False, 'Registered': True, 'MacAddress': 'AA:BB:CC:DD:EE:FF'}
+            ]
+            for data in registered_esps_data:
+                registered_esp = RegisteredESPs(**data)
+                db.session.add(registered_esp)
 
-        users_data = [
-            {'DeviceIndex': 1, 'Username': 'User1'},
-            {'DeviceIndex': 2, 'Username': 'User2'},
-            {'DeviceIndex': 1, 'Username': 'User3'}
-        ]
-        for data in users_data:
-            user = Users(**data)
-            db.session.add(user)
+            users_data = [
+                {'DeviceIndex': 1, 'Username': 'User1'},
+                {'DeviceIndex': 2, 'Username': 'User2'},
+                {'DeviceIndex': 1, 'Username': 'User3'}
+            ]
+            for data in users_data:
+                user = Users(**data)
+                db.session.add(user)
 
-        topics_data = [
-            {'Title': 'Topic 1', 'Description': 'Description for Topic 1', 'StartTime': '2023-01-01', 'EndTime': '2023-01-10'},
-            {'Title': 'Topic 2', 'Description': 'Description for Topic 2', 'StartTime': '2023-02-01', 'EndTime': '2023-02-15'}
-        ]
-        for data in topics_data:
-            topic = Topics(**data)
-            db.session.add(topic)
+            topics_data = [
+                {'Title': 'Topic 1', 'Description': 'Description for Topic 1', 'StartTime': '2023-01-01', 'EndTime': '2023-01-10'},
+                {'Title': 'Topic 2', 'Description': 'Description for Topic 2', 'StartTime': '2023-02-01', 'EndTime': '2023-02-15'}
+            ]
+            for data in topics_data:
+                topic = Topics(**data)
+                db.session.add(topic)
 
-        votes_data = [
-            {'UserID': 1, 'VoteType': 'yes', 'TopicID': 1},
-            {'UserID': 2, 'VoteType': 'no', 'TopicID': 1},
-            {'UserID': 3, 'VoteType': 'yes', 'TopicID': 2}
-        ]
-        for data in votes_data:
-            vote = Votes(**data)
-            db.session.add(vote)
+            votes_data = [
+                {'UserID': 1, 'VoteType': 'yes', 'TopicID': 1},
+                {'UserID': 2, 'VoteType': 'no', 'TopicID': 1},
+                {'UserID': 3, 'VoteType': 'yes', 'TopicID': 2}
+            ]
+            for data in votes_data:
+                vote = Votes(**data)
+                db.session.add(vote)
 
-        db.session.commit()
-        return jsonify("Data inserted successfully.")
+            db.session.commit()
+            return jsonify("Data inserted successfully.")
 
     except Exception as errorMsg:
         error_message = {"error": str(errorMsg)}
@@ -295,62 +306,66 @@ def register_esp(app, mac_address):
 
 
 # Create a new ESP with the given macAddress.
-def add_esp(mac_address):
+def add_esp(app, mac_address):
     try:
-        add_esp = RegisteredESPs(MacAddress=mac_address)
-        db.session.add(add_esp)
-        db.session.commit()
+        with app.app_context():
+            add_esp = RegisteredESPs(MacAddress=mac_address)
+            db.session.add(add_esp)
+            db.session.commit()
 
-        registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
+            registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
 
-        return registered_esp, True
+            return registered_esp, True
 
     except Exception as errorMsg:
         return str(errorMsg), False
 
 
 # Unregister specific ESP
-def unregister_esp(device_index):
+def unregister_esp(app, device_index):
     try:
-        esp = RegisteredESPs.query.get(device_index)
+        with app.app_context():
+            esp = RegisteredESPs.query.get(device_index)
 
-        if esp:
-            esp.Registered = False
-            db.session.commit()
-            return esp, True #TODO: return something else than esp
-        else:
-            return "ESP not found with the given DeviceIndex", False
+            if esp:
+                esp.Registered = False
+                db.session.commit()
+                return esp, True #TODO: return something else than esp
+            else:
+                return "ESP not found with the given DeviceIndex", False
 
     except Exception as errorMsg:
         return str(errorMsg), False
 
 
 # Unregister all ESPs.
-def unregister_all_esps():
+def unregister_all_esps(app):
     try:
-        registered_esps = RegisteredESPs.query.all()
+        with app.app_context():
+            registered_esps = RegisteredESPs.query.all()
 
-        for esp in registered_esps:
-            esp.Registered = False
+            for esp in registered_esps:
+                esp.Registered = False
 
-        db.session.commit()
+            db.session.commit()
 
-        return "All ESPs unregistered.", True #TODO: return something else.
+            return "All ESPs unregistered.", True #TODO: return something else.
 
     except Exception as errorMsg:
         return str(errorMsg), False
     
 
 # POST new topic (vote) to the database.   
-def create_topic(obj: voteHandling.VoteInformation):
+def create_topic(app, obj: voteHandling.VoteInformation):
     try:
-        topic = Topics(Title=obj.title, Description=obj.description, StartTime=obj.voteStartTime, EndTime=obj.voteEndTime)
-        db.session.add(topic)
-        db.session.commit()
+        with app.app_context():
+            topic = Topics(Title=obj.title, Description=obj.description, StartTime=obj.voteStartTime, EndTime=obj.voteEndTime)
+            db.session.add(topic)
+            db.session.commit()
 
-        obj.topicID = topic.TopicID
+            obj.topicID = topic.TopicID
 
-        return "Topic created successfully.", True
+            return "Topic created successfully.", True
 
     except Exception as errorMsg:
         return str(errorMsg), False
@@ -358,33 +373,35 @@ def create_topic(obj: voteHandling.VoteInformation):
 
 # Register user to ESP.
 # Create a new user in the database.
-def create_user(username, deviceID):
+def create_user(app, username, deviceID):
     try:
-        user = Users(Username=username, DeviceIndex=deviceID)
-        db.session.add(user)
-        db.session.commit()
+        with app.app_context():
+            user = Users(Username=username, DeviceIndex=deviceID)
+            db.session.add(user)
+            db.session.commit()
 
-        return "User created successfully.", True
+            return "User created successfully.", True
 
     except Exception as errorMsg:
         return str(errorMsg), False
 
 
 # Assign user to ESP.
-def assign_user_to_esp(userID, espID):
+def assign_user_to_esp(app, userID, espID):
     try:
-        user = Users.query.get(userID)
-        esp = RegisteredESPs.query.get(espID)
+        with app.app_context():
+            user = Users.query.get(userID)
+            esp = RegisteredESPs.query.get(espID)
 
-        if user and esp:
-            user.DeviceIndex = esp.DeviceIndex
-            esp.Assigned = True
-            db.session.commit()
+            if user and esp:
+                user.DeviceIndex = esp.DeviceIndex
+                esp.Assigned = True
+                db.session.commit()
 
-            return "User assigned to ESP successfully.", True
+                return "User assigned to ESP successfully.", True
 
-        else:
-            return "User or ESP not found.", False
+            else:
+                return "User or ESP not found.", False
 
     except Exception as errorMsg:
         return str(errorMsg), False
@@ -392,19 +409,19 @@ def assign_user_to_esp(userID, espID):
 
 # Update ESP and user vote.
 # Assumes vote time has been verified prior to calling this function.
-def update_vote(DeviceID, voteType):
+def update_vote(app, DeviceID, voteType):
     try:
-        esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
-        
-        if esp.Assigned == True:
-            user = Users.query.filter_by(DeviceIndex=esp.DeviceIndex).first()
-            vote = Votes.query.filter_by(UserID=user.UserID).first()
-            vote.VoteType = voteType
-            db.session.commit()
-            return "Vote updated successfully.", True
-        else:
-            print("ESP not assigned.")
-            return "ESP not assigned.", False
+        with app.app_context():
+            esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
+            
+            if esp.Assigned:
+                user = Users.query.filter_by(DeviceIndex=esp.DeviceIndex).first()
+                vote = Votes.query.filter_by(UserID=user.UserID).first()
+                vote.VoteType = voteType
+                db.session.commit()
+                return "Vote updated successfully.", True
+            else:
+                return "ESP not assigned.", False
     except Exception as errorMsg:
-        print("Error: " + str(errorMsg))
         return str(errorMsg), False
+

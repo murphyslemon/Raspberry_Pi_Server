@@ -124,13 +124,13 @@ def getRegisteredESPs():
 # GET all Topics (votes).
 @app.route('/api/getTopics', methods=['GET'])
 def getTopics():
-    return dbFunctions.get_topics()
+    return dbFunctions.get_all_topics(app)
 
 
 # GET Specific Topic (vote).
 @app.route('/api/getTopic/<topicID>', methods=['GET'])
 def getTopic(topicID):
-    return dbFunctions.get_topic(topicID)
+    return dbFunctions.get_topic(app, topicID)
 
 
 # Create new Topic (vote).
@@ -143,7 +143,7 @@ def createTopic():
         globalVoteInformation.updateVoteInformation(data['title'], data['description'], data['voteStartTime'], data['voteEndTime'])
 
         # Create new topic in database.
-        if dbFunctions.create_topic(globalVoteInformation) == True:
+        if dbFunctions.create_topic(app, globalVoteInformation) == True:
             # TODO: figure out voteStartTiming.
             return jsonify({'message': 'Topic created.'}), 200
         else:
@@ -158,7 +158,7 @@ def createTopic():
 def assignUserToESP():
     try:
         data = request.json
-        dbFunctions.assign_user_to_esp(data['userID'], data['espID'])
+        dbFunctions.assign_user_to_esp(app, data['userID'], data['espID'])
     
         return jsonify({'message': 'User assigned to ESP.'}), 200
     
