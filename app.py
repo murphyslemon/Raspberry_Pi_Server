@@ -134,8 +134,8 @@ def createTopic():
     try:
         # Setup vote information.
         data = request.json
-        mqttImports.validateKeywordsInJSON(data, ['title', 'description', 'voteStartTime', 'voteEndTime'], 1)
-        globalVoteInformation.updateVoteInformation(data['title'], data['description'], data['voteStartTime'], data['voteEndTime'])
+        mqttImports.validateKeywordsInJSON(data, ['Title', 'Description', 'StartTime', 'EndTime'], 1)
+        globalVoteInformation.updateVoteInformation(data['Title'], data['Description'], data['StartTime'], data['EndTime'])
 
         # Create new topic in database.
         if dbFunctions.create_topic(app, globalVoteInformation) == True:
