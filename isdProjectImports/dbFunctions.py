@@ -315,10 +315,10 @@ def register_esp(app, mac_address):
                 device_id = str(uuid.uuid4())
                 registered_esp.DeviceID = device_id
                 registered_esp.Registered = True
-
                 db.session.commit()
 
                 # Return the instance of RegisteredESPs
+                registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
                 return registered_esp, True
 
             else:
@@ -341,9 +341,8 @@ def add_esp(app, mac_address):
             db.session.add(add_esp)
             db.session.commit()
 
-            registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
-
             # Return the instance of RegisteredESPs
+            registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
             return registered_esp, True
 
     except Exception as errorMsg:
