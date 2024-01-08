@@ -21,7 +21,7 @@ class RegisteredESPs(db.Model):
 class Users(db.Model):
     __tablename__ = 'users'
     UserID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    Username = db.Column(db.Text, unique=True)
+    Username = db.Column(db.Text, =True)
     DeviceIndex = db.Column(db.Integer, db.ForeignKey('registeredesps.DeviceIndex'))
     RegistrationDate = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
     registered_esp = db.relationship('RegisteredESPs', backref='users')
@@ -610,7 +610,7 @@ def create_topic(app, obj: voteHandling.VoteInformation):
             logFile.write(f'{datetime.now()}: dbFunctions.create_topic(), {str(errorMsg)}\n')
         return False
 
-
+# TODO: rework to handle existing users.
 def create_user(app, username, registrationDate):
     """Create a new user in the database.
 
@@ -652,7 +652,7 @@ def create_user(app, username, registrationDate):
     except Exception as errorMsg:
         return str(errorMsg), False
 
-
+# TODO: rework to handle existing users.
 def assign_user_to_esp(app, username, registrationDate, espID):
     """Assign a user to an ESP in the database.
 
