@@ -681,6 +681,8 @@ def assign_user_to_esp(app, username, registrationDate, espID):
 
     # Create user in DB.
     user, status = create_user(app, username, registrationDate)
+    print(user, status)
+
     if status == False:
         with open('log.txt', 'a') as logFile:
             logFile.write(f'{datetime.now()}: dbFunctions.assign_user_to_esp(), {user}\n')

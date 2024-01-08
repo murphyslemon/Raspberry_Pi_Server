@@ -131,8 +131,7 @@ def getTopic(topicID):
 # Create new Topic (vote).
 @app.route('/api/createTopic', methods=['POST'])
 def createTopic():
-    """Input JSON format
-
+    """Input JSON format:
     {
         "Title": "TEXT",
         "Description": "TEXT",
@@ -166,8 +165,7 @@ def createTopic():
 # Assign user to ESP.
 @app.route('/api/assignUserToESP', methods=['POST'])
 def assignUserToESP():
-    """Input JSON format
-
+    """Input JSON format:
     {
         "username": "TEXT",
         "registrationDate": "YYY-MM-DD HH:MM:SS",
