@@ -132,8 +132,8 @@ def getTopic(topicID):
 @app.route('/api/createTopic', methods=['POST'])
 def createTopic():
     try:
-        # Setup vote information.
         data = request.json
+        # Validate request.
         if mqttImports.validateKeywordsInJSON(data, ['Title', 'Description', 'StartTime', 'EndTime'], 1) == False:
             with open('log.txt', 'a') as logFile:
                 logFile.write(f'{datetime.now()}: createTopic(), Invalid request.\n')
@@ -159,6 +159,12 @@ def createTopic():
 def assignUserToESP():
     try:
         data = request.json
+        # Validate request.
+        if mqttImports.validateKeywordsInJSON(data, ['userID', 'espID'], 1) == False:
+            with open('log.txt', 'a') as logFile:
+                logFile.write(f'{datetime.now()}: assignUserToESP(), Invalid request.\n')
+            return jsonify({'message': 'Invalid request.'}), 400
+        
         dbFunctions.assign_user_to_esp(app, data['userID'], data['espID'])
     
         return jsonify({'message': 'User assigned to ESP.'}), 200

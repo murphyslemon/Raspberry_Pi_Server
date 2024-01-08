@@ -43,9 +43,27 @@ class Votes(db.Model):
     VoteTime = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
 
-
-# GET all registered ESPs from the database.
 def get_registered_esps(app):
+    """Retrieve information about registered ESP devices from the database.
+
+    Args:
+        app: The Flask application object.
+
+    Returns:
+        JSON: A JSON response containing information about registered ESP devices.
+            Each device is represented by a dictionary with keys including:
+                - DeviceIndex: The index of the device.
+                - DeviceID: The unique ID of the device.
+                - RegistrationTime: Time of device registration.
+                - LastActiveTime: Time of the device's last activity.
+                - Assigned: Status of device assignment.
+                - Registered: Status of device registration.
+                - MacAddress: MAC address of the device.
+
+    Raises:
+        JSON: A JSON response with an error message and a status code 500 in case of an exception.
+    """
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.get_registered_esps()\n')
 
@@ -79,8 +97,27 @@ def get_registered_esps(app):
         return jsonify(error_message), 500
 
 
-# GET all Esps from the database.
 def get_all_esps(app):
+    """Retrieve information about all ESP devices from the database.
+
+    Args:
+        app: The Flask application object.
+
+    Returns:
+        JSON: A JSON response containing information about all ESP devices.
+            Each device is represented by a dictionary with keys including:
+                - DeviceIndex: The index of the device.
+                - DeviceID: The unique ID of the device.
+                - RegistrationTime: Time of device registration.
+                - LastActiveTime: Time of the device's last activity.
+                - Assigned: Status of device assignment.
+                - Registered: Status of device registration.
+                - MacAddress: MAC address of the device.
+
+    Raises:
+        JSON: A JSON response with an error message and a status code 500 in case of an exception.
+    """
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.get_all_esps()\n')
 
@@ -108,8 +145,25 @@ def get_all_esps(app):
         return jsonify(error_message), 500
 
 
-# GET all topics (votes) from the database.
 def get_all_topics(app):
+    """Retrieve information about all topics from the database.
+
+    Args:
+        app: The Flask application object.
+
+    Returns:
+        JSON: A JSON response containing information about all topics.
+            Each topic is represented by a dictionary with keys including:
+                - TopicID: The unique ID of the topic.
+                - Title: The title of the topic.
+                - Description: The description of the topic.
+                - StartTime: The start time of the topic.
+                - EndTime: The end time of the topic.
+
+    Raises:
+        JSON: A JSON response with an error message and a status code 500 in case of an exception.
+    """
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.get_all_topics()\n')
 
@@ -135,8 +189,26 @@ def get_all_topics(app):
         return jsonify(error_message), 500
 
 
-# GET topic (vote) based on topicID from the database.
 def get_topic(app, topicID):
+    """Retrieve information about a specific topic from the database.
+
+    Args:
+        app: The Flask application object.
+        topicID (int): The unique ID of the topic to retrieve.
+
+    Returns:
+        JSON: A JSON response containing information about the requested topic.
+            The returned dictionary includes keys such as:
+                - TopicID: The unique ID of the topic.
+                - Title: The title of the topic.
+                - Description: The description of the topic.
+                - StartTime: The start time of the topic.
+                - EndTime: The end time of the topic.
+
+    Raises:
+        JSON: A JSON response with an error message and a status code 500 in case of an exception.
+    """
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.get_topic()\n')
 
@@ -159,8 +231,26 @@ def get_topic(app, topicID):
         return jsonify(error_message), 500
 
 
-# GET all votes from the database based on topicID.
 def get_votes(app, topicID):
+    """Retrieve votes related to a specific topic from the database.
+
+    Args:
+        app: The Flask application object.
+        topicID (int): The unique ID of the topic to retrieve votes for.
+
+    Returns:
+        JSON: A JSON response containing information about the votes related to the specified topic.
+            The returned list includes dictionaries for each vote with keys such as:
+                - VoteID: The unique ID of the vote.
+                - UserID: The ID of the user who cast the vote.
+                - VoteType: The type of the vote.
+                - TopicID: The ID of the topic the vote is related to.
+                - VoteTime: The timestamp of when the vote was cast.
+
+    Raises:
+        JSON: A JSON response with an error message and a status code 500 in case of an exception.
+    """
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.get_votes()\n')
 
@@ -186,8 +276,26 @@ def get_votes(app, topicID):
         return jsonify(error_message), 500
     
 
-# GET all votes from the database based on userID.
 def get_votes_by_user(app, userID):
+    """Retrieve votes cast by a specific user from the database.
+
+    Args:
+        app: The Flask application object.
+        userID (int): The unique ID of the user to retrieve votes for.
+
+    Returns:
+        JSON: A JSON response containing information about the votes cast by the specified user.
+            The returned list includes dictionaries for each vote with keys such as:
+                - VoteID: The unique ID of the vote.
+                - UserID: The ID of the user who cast the vote.
+                - VoteType: The type of the vote.
+                - TopicID: The ID of the topic the vote is related to.
+                - VoteTime: The timestamp of when the vote was cast.
+
+    Raises:
+        JSON: A JSON response with an error message and a status code 500 in case of an exception.
+    """
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.get_votes_by_user()\n')
 
@@ -291,9 +399,28 @@ def insert_data(app):
         return jsonify(error_message), 500
     
 
-# Function to register an ESP by updating its DeviceID and Registered status
-# Function to register an ESP by updating its DeviceID and Registered status
 def register_esp(app, mac_address):
+    """Register an ESP by updating its DeviceID and Registered status in the database.
+
+    Args:
+        app: The Flask application object.
+        mac_address (str): The MAC address of the ESP to be registered.
+
+    Returns:
+        tuple or str: A tuple containing the instance of RegisteredESPs and a boolean value indicating the operation's success.
+            - If the operation succeeds, returns the RegisteredESPs instance and True.
+            - If the given MAC address is not found, it attempts to add the ESP and returns the result of add_esp function.
+            - In case of an exception, returns the error message as a string and False.
+
+    Note:
+        - The returned tuple contains either the RegisteredESPs instance and True or an error message and False.
+        - The function updates the DeviceID and Registered status for the ESP and commits changes to the database.
+
+    Raises:
+        Exception: If an error occurs during the registration process.
+
+    """
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.register_esp()\n')
 
@@ -320,8 +447,29 @@ def register_esp(app, mac_address):
         return str(errorMsg), False
 
 
-# Function to add a new ESP to the database
 def add_esp(app, mac_address):
+    """Add a new ESP to the database.
+
+    Args:
+        app: The Flask application object.
+        mac_address (str): The MAC address of the ESP to be added.
+
+    Returns:
+        tuple or str: A tuple containing the instance of RegisteredESPs and a boolean value indicating the operation's success.
+            - If the operation succeeds, returns the RegisteredESPs instance and True.
+            - In case of an exception, returns the error message as a string and False.
+
+    Note:
+        - The returned tuple contains either the RegisteredESPs instance and True or an error message and False.
+        - The function adds a new ESP to the database with the provided MAC address, setting Registered as True
+          and generating a new DeviceID using uuid4().
+        - The function commits changes to the database.
+
+    Raises:
+        Exception: If an error occurs during the ESP addition process.
+
+    """
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.add_esp()\n')
 
@@ -339,8 +487,29 @@ def add_esp(app, mac_address):
         return str(errorMsg), False
 
 
-# Unregister specific ESP
-def unregister_esp(app, device_index): 
+def unregister_esp(app, device_index):
+    """Unregister an ESP from the database.
+
+    Args:
+        app: The Flask application object.
+        device_index (int): The DeviceIndex of the ESP to be unregistered.
+
+    Returns:
+        tuple or str: A tuple containing the instance of RegisteredESPs and a boolean value indicating the operation's success.
+            - If the operation succeeds, returns the RegisteredESPs instance and True.
+            - If the ESP with the given DeviceIndex is not found, returns an error message and False.
+            - In case of an exception, returns the error message as a string and False.
+
+    Note:
+        - The returned tuple contains either the RegisteredESPs instance and True, an error message, or False.
+        - The function finds the ESP in the database using the provided DeviceIndex and sets its Registered status as False.
+        - The function commits changes to the database.
+
+    Raises:
+        Exception: If an error occurs during the ESP unregistering process.
+
+    """
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.unregister_esp()\n')
 
@@ -359,8 +528,27 @@ def unregister_esp(app, device_index):
         return str(errorMsg), False
 
 
-# Unregister all ESPs.
 def unregister_all_esps(app):
+    """Unregister all ESPs from the database.
+
+    Args:
+        app: The Flask application object.
+
+    Returns:
+        tuple or str: A tuple containing a success message and a boolean value indicating the operation's success.
+            - If the operation succeeds, returns "All ESPs unregistered." and True.
+            - In case of an exception, returns the error message as a string and False.
+
+    Note:
+        - This function sets the Registered status of all ESPs in the database as False.
+        - It utilizes the RegisteredESPs model and commits changes to the database.
+        - The returned tuple contains either a success message and True or an error message and False.
+
+    Raises:
+        Exception: If an error occurs during the ESPs unregistering process.
+
+    """
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.unregister_all_esps()\n')
 
@@ -379,8 +567,31 @@ def unregister_all_esps(app):
         return str(errorMsg), False
     
 
-# POST new topic (vote) to the database.   
 def create_topic(app, obj: voteHandling.VoteInformation):
+    """Create a new topic in the database based on the provided VoteInformation object.
+
+    Args:
+        app: The Flask application object.
+        obj (voteHandling.VoteInformation): An object containing information about the topic:
+            - title (str): Title of the topic.
+            - description (str): Description of the topic.
+            - voteStartTime (datetime): Start time of the topic.
+            - voteEndTime (datetime): End time of the topic.
+
+    Returns:
+        bool: True if the topic creation succeeds; False otherwise.
+
+    Note:
+        - This function creates a new entry in the Topics table with the provided information.
+        - It utilizes the Topics model and commits changes to the database.
+        - The topicID attribute of the provided obj is updated with the ID of the created topic.
+        - Returns True upon successful creation; False otherwise.
+
+    Raises:
+        Exception: If an error occurs during the topic creation process.
+
+    """
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.create_topic()\n')
 
@@ -400,43 +611,93 @@ def create_topic(app, obj: voteHandling.VoteInformation):
         return False
 
 
-# Register user to ESP.
-# Create a new user in the database.
-def create_user(app, username, deviceID):
+def create_user(app, username, registrationDate):
+    """Create a new user in the database.
+
+    Args:
+        app: The Flask application object.
+        username (str): The username of the new user.
+        registrationDate (datetime): The registration date of the new user.
+
+    Returns:
+        tuple: A tuple containing the registered user object and a boolean indicating success.
+            - If successful, the first element is the instance of the registered user (Users model).
+            - If unsuccessful, the first element is an error message.
+            - The second element is a boolean flag indicating success (True/False).
+
+    Note:
+        - This function creates a new entry in the Users table with the provided username and registration date.
+        - It utilizes the Users model and commits changes to the database.
+        - Returns a tuple containing the registered user object and a success flag.
+            - If successful, returns the registered user object and True.
+            - If an error occurs, returns an error message and False.
+
+    Raises:
+        Exception: If an error occurs during the user creation process.
+    """
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.create_user()\n')
 
     try:
         with app.app_context():
-            user = Users(Username=username, DeviceIndex=deviceID)
+            user = Users(Username=username, RegistrationDate=registrationDate)
             db.session.add(user)
             db.session.commit()
 
-            return "User created successfully.", True
+            registered_user = Users.query.filter_by(Username=username, RegistrationDate=registrationDate).first()
+
+            return registered_user, True
 
     except Exception as errorMsg:
         return str(errorMsg), False
 
 
-# Assign user to ESP.
-def assign_user_to_esp(app, userID, espID):
+def assign_user_to_esp(app, username, registrationDate, espID):
+    """Assign a user to an ESP in the database.
+
+    Args:
+        app: The Flask application object.
+        username (str): The username of the user to be assigned.
+        registrationDate (datetime): The registration date of the user.
+        espID (str): The ID of the ESP to which the user will be assigned.
+
+    Returns:
+        tuple: A tuple containing a JSON response message and an HTTP status code.
+            - If successful, the first element is a JSON response indicating success and a status code 200.
+            - If the user creation fails, the first element is a JSON response indicating failure and a status code 500 or an error message.
+
+    Note:
+        - This function creates a new user in the Users table with the provided username and registration date.
+        - It then tries to assign the user to the specified ESP.
+        - Returns a JSON response message with an HTTP status code indicating the outcome of the assignment process.
+
+    Raises:
+        Exception: If an error occurs during user creation or assignment process.
+    """
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.assign_user_to_esp()\n')
 
+    # Create user in DB.
+    user, status = create_user(app, username, registrationDate)
+    if status == False:
+        with open('log.txt', 'a') as logFile:
+            logFile.write(f'{datetime.now()}: dbFunctions.assign_user_to_esp(), {user}\n')
+            return jsonify({'message': 'Failed to create user.'}), 500
+
+    # Assign user to ESP.
     try:
         with app.app_context():
-            user = Users.query.get(userID)
-            esp = RegisteredESPs.query.get(espID)
+            esp = RegisteredESPs.query.filter_by(DeviceID=espID).first()
 
-            if user and esp:
-                user.DeviceIndex = esp.DeviceIndex
+            if esp.Assigned == False:
                 esp.Assigned = True
+                user.DeviceIndex = esp.DeviceIndex
                 db.session.commit()
-
-                return "User assigned to ESP successfully.", True
-
+                return jsonify({'message': 'User assigned to ESP successfully.'}), 200
             else:
-                return "User or ESP not found.", False
+                return jsonify({'message': 'ESP already assigned.'}), 400
 
     except Exception as errorMsg:
         return str(errorMsg), False
@@ -445,6 +706,25 @@ def assign_user_to_esp(app, userID, espID):
 # Update ESP and user vote.
 # Assumes vote time has been verified prior to calling this function.
 def update_vote(app, DeviceID, voteType):
+    """Update the vote type for a user associated with a specific ESP.
+
+    Args:
+        app: The Flask application object.
+        DeviceID (str): The ID of the ESP.
+        voteType (str): The updated vote type.
+
+    Returns:
+        tuple: A tuple containing a message and a boolean indicating success.
+            - If successful, returns a message string indicating successful vote update and True.
+            - If the ESP is not assigned or an error occurs, returns an error message and False.
+
+    Note:
+        - This function updates the vote type for a user associated with the specified ESP.
+        - Retrieves the ESP information based on the provided DeviceID.
+        - If the ESP is assigned, it fetches the associated user and updates the vote type.
+        - Returns a message indicating the success or failure of the vote update process.
+    """
+    
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.update_vote()\n')
 
