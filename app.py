@@ -131,6 +131,15 @@ def getTopic(topicID):
 # Create new Topic (vote).
 @app.route('/api/createTopic', methods=['POST'])
 def createTopic():
+    """Input JSON format
+
+    {
+        "Title": "TEXT",
+        "Description": "TEXT",
+        "StartTime": "YYY-MM-DD HH:MM:SS",
+        "EndTime": "YYY-MM-DD HH:MM:SS"
+    }
+    """
     try:
         data = request.json
         # Validate request.
@@ -157,15 +166,24 @@ def createTopic():
 # Assign user to ESP.
 @app.route('/api/assignUserToESP', methods=['POST'])
 def assignUserToESP():
+    """Input JSON format
+
+    {
+        "username": "TEXT",
+        "registrationDate": "YYY-MM-DD HH:MM:SS",
+        "espID": "INT"
+    }
+    """
     try:
         data = request.json
+
         # Validate request.
-        if mqttImports.validateKeywordsInJSON(data, ['userID', 'espID'], 1) == False:
+        if mqttImports.validateKeywordsInJSON(data, ['username', 'registrationDate', 'espID'], 1) == False:
             with open('log.txt', 'a') as logFile:
                 logFile.write(f'{datetime.now()}: assignUserToESP(), Invalid request.\n')
             return jsonify({'message': 'Invalid request.'}), 400
         
-        dbFunctions.assign_user_to_esp(app, data['userID'], data['espID'])
+        dbFunctions.assign_user_to_esp(app, data['username'], data['registrationDate'], data['espID'])
     
         return jsonify({'message': 'User assigned to ESP.'}), 200
     

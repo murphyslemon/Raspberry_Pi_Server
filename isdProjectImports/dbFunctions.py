@@ -691,20 +691,15 @@ def assign_user_to_esp(app, username, registrationDate, espID):
         with app.app_context():
             esp = RegisteredESPs.query.filter_by(DeviceID=espID).first()
 
-            if esp.Assigned == False:
-                esp.Assigned = True
-                user.DeviceIndex = esp.DeviceIndex
-                db.session.commit()
-                return jsonify({'message': 'User assigned to ESP successfully.'}), 200
-            else:
-                return jsonify({'message': 'ESP already assigned.'}), 400
+            esp.Assigned = True
+            user.DeviceIndex = esp.DeviceIndex
+            db.session.commit()
+            return jsonify({'message': 'User assigned to ESP successfully.'}), 200
 
     except Exception as errorMsg:
         return str(errorMsg), False
     
 
-# Update ESP and user vote.
-# Assumes vote time has been verified prior to calling this function.
 def update_vote(app, DeviceID, voteType):
     """Update the vote type for a user associated with a specific ESP.
 
@@ -724,7 +719,7 @@ def update_vote(app, DeviceID, voteType):
         - If the ESP is assigned, it fetches the associated user and updates the vote type.
         - Returns a message indicating the success or failure of the vote update process.
     """
-    
+
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.update_vote()\n')
 
