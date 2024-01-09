@@ -607,12 +607,14 @@ def create_topic(app, obj: voteHandling.VoteInformation):
         return False
 
 
-def create_user(app, username):
-    """Create a new user in the database.
+def create_user(app, username, espID):
+    """
+    Create a new user in the database.
 
     Args:
         app: The Flask application object.
         username (str): The username of the new user.
+        espID (int): The ID of the ESP to which the user is associated.
 
     Returns:
         tuple: A tuple containing the registered user object and a boolean indicating success.
@@ -621,7 +623,7 @@ def create_user(app, username):
             - The second element is a boolean flag indicating success (True/False).
 
     Note:
-        - This function creates a new entry in the Users table with the provided username.
+        - This function creates a new entry in the Users table with the provided username and ESP ID.
         - It utilizes the Users model and commits changes to the database.
         - Returns a tuple containing the registered user object and a success flag.
             - If successful, returns the registered user object and True.
@@ -636,7 +638,7 @@ def create_user(app, username):
 
     try:
         with app.app_context():
-            user = Users(Username=username)
+            user = Users(Username=username, DeviceIndex=espID)
             db.session.add(user)
             db.session.commit()
 
@@ -650,7 +652,8 @@ def create_user(app, username):
 
 
 def assign_user_to_esp(app, username, espID):
-    """Assign a user to an ESP in the database.
+    """
+    Assign a user to an ESP in the database.
 
     Args:
         app: The Flask application object.
@@ -683,7 +686,7 @@ def assign_user_to_esp(app, username, espID):
                 return jsonify({'message': 'ESP not found.'}), 404
             
             # Create user in DB.
-            user, status = create_user(app, username)
+            user, status = create_user(app, username, espID)
             if not status:
                 with open('log.txt', 'a') as logFile:
                     logFile.write(f'{datetime.now()}: dbFunctions.assign_user_to_esp(), failed to create user: "{user}"\n')
@@ -691,10 +694,6 @@ def assign_user_to_esp(app, username, espID):
 
             # Assign user to ESP.
             esp.Assigned = True
-
-            # Force update the user's DeviceIndex.
-            update_query = f"UPDATE Users SET DeviceIndex = {esp.DeviceIndex} WHERE UserID = {user.UserID}"
-            db.session.execute(update_query)
 
             db.session.commit()
             return jsonify({'message': 'User assigned to ESP successfully.'}), 200
