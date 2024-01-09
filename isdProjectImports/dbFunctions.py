@@ -679,7 +679,7 @@ def assign_user_to_esp(app, username, espID):
 
     if status == False:
         with open('log.txt', 'a') as logFile:
-            logFile.write(f'{datetime.now()}: dbFunctions.assign_user_to_esp(), {user}\n')
+            logFile.write(f'{datetime.now()}: dbFunctions.assign_user_to_esp(), failed to create user: "{user}"\n')
             return jsonify({'message': 'Failed to create user.'}), 500
 
     # Assign user to ESP.
