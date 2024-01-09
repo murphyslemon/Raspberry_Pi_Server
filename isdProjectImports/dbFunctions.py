@@ -50,7 +50,7 @@ def get_registered_esps(app):
 
     Returns:
         JSON: A JSON response containing information about registered ESP devices.
-            Each device is represented by a dictionary with keys including:
+            Each device is represented by a dictionary with keys including:\n
                 - DeviceIndex: The index of the device.
                 - DeviceID: The unique ID of the device.
                 - RegistrationTime: Time of device registration.
@@ -104,7 +104,7 @@ def get_all_esps(app):
 
     Returns:
         JSON: A JSON response containing information about all ESP devices.
-            Each device is represented by a dictionary with keys including:
+            Each device is represented by a dictionary with keys including:\n
                 - DeviceIndex: The index of the device.
                 - DeviceID: The unique ID of the device.
                 - RegistrationTime: Time of device registration.
@@ -152,7 +152,7 @@ def get_all_topics(app):
 
     Returns:
         JSON: A JSON response containing information about all topics.
-            Each topic is represented by a dictionary with keys including:
+            Each topic is represented by a dictionary with keys including:\n
                 - TopicID: The unique ID of the topic.
                 - Title: The title of the topic.
                 - Description: The description of the topic.
@@ -197,7 +197,7 @@ def get_topic(app, topicID):
 
     Returns:
         JSON: A JSON response containing information about the requested topic.
-            The returned dictionary includes keys such as:
+            The returned dictionary includes keys such as:\n
                 - TopicID: The unique ID of the topic.
                 - Title: The title of the topic.
                 - Description: The description of the topic.
@@ -239,7 +239,7 @@ def get_votes(app, topicID):
 
     Returns:
         JSON: A JSON response containing information about the votes related to the specified topic.
-            The returned list includes dictionaries for each vote with keys such as:
+            The returned list includes dictionaries for each vote with keys such as:\n
                 - VoteID: The unique ID of the vote.
                 - UserID: The ID of the user who cast the vote.
                 - VoteType: The type of the vote.
@@ -284,7 +284,7 @@ def get_votes_by_user(app, userID):
 
     Returns:
         JSON: A JSON response containing information about the votes cast by the specified user.
-            The returned list includes dictionaries for each vote with keys such as:
+            The returned list includes dictionaries for each vote with keys such as:\n
                 - VoteID: The unique ID of the vote.
                 - UserID: The ID of the user who cast the vote.
                 - VoteType: The type of the vote.
@@ -403,7 +403,7 @@ def register_esp(app, mac_address):
         mac_address (str): The MAC address of the ESP to be registered.
 
     Returns:
-        tuple or str: A tuple containing the instance of RegisteredESPs and a boolean value indicating the operation's success.
+        tuple or str: A tuple containing the instance of RegisteredESPs and a boolean value indicating the operation's success.\n
             - If the operation succeeds, returns the RegisteredESPs instance and True.
             - If the given MAC address is not found, it attempts to add the ESP and returns the result of add_esp function.
             - In case of an exception, returns the error message as a string and False.
@@ -451,7 +451,7 @@ def add_esp(app, mac_address):
         mac_address (str): The MAC address of the ESP to be added.
 
     Returns:
-        tuple or str: A tuple containing the instance of RegisteredESPs and a boolean value indicating the operation's success.
+        tuple or str: A tuple containing the instance of RegisteredESPs and a boolean value indicating the operation's success.\n
             - If the operation succeeds, returns the RegisteredESPs instance and True.
             - In case of an exception, returns the error message as a string and False.
 
@@ -491,7 +491,7 @@ def unregister_esp(app, device_index):
         device_index (int): The DeviceIndex of the ESP to be unregistered.
 
     Returns:
-        tuple or str: A tuple containing the instance of RegisteredESPs and a boolean value indicating the operation's success.
+        tuple or str: A tuple containing the instance of RegisteredESPs and a boolean value indicating the operation's success.\n
             - If the operation succeeds, returns the RegisteredESPs instance and True.
             - If the ESP with the given DeviceIndex is not found, returns an error message and False.
             - In case of an exception, returns the error message as a string and False.
@@ -531,7 +531,7 @@ def unregister_all_esps(app):
         app: The Flask application object.
 
     Returns:
-        tuple or str: A tuple containing a success message and a boolean value indicating the operation's success.
+        tuple or str: A tuple containing a success message and a boolean value indicating the operation's success.\n
             - If the operation succeeds, returns "All ESPs unregistered." and True.
             - In case of an exception, returns the error message as a string and False.
 
@@ -567,8 +567,8 @@ def create_topic(app, obj: voteHandling.VoteInformation):
     """Create a new topic in the database based on the provided VoteInformation object.
 
     Args:
-        app: The Flask application object.
-        obj (voteHandling.VoteInformation): An object containing information about the topic:
+        app: The Flask application object.\n
+        obj (voteHandling.VoteInformation): An object containing information about the topic:\n
             - title (str): Title of the topic.
             - description (str): Description of the topic.
             - voteStartTime (datetime): Start time of the topic.
@@ -617,7 +617,7 @@ def create_user(app, username, espID):
         espID (int): The ID of the ESP to which the user is associated.
 
     Returns:
-        tuple: A tuple containing the registered user object and a boolean indicating success.
+        tuple: A tuple containing the registered user object and a boolean indicating success.\n
             - If successful, the first element is the instance of the registered user (Users model).
             - If unsuccessful, the first element is an error message.
             - The second element is a boolean flag indicating success (True/False).
@@ -661,7 +661,7 @@ def assign_user_to_esp(app, username, espID):
         espID (str): The ID of the ESP to which the user will be assigned.
 
     Returns:
-        tuple: A tuple containing a JSON response message and an HTTP status code.
+        tuple: A tuple containing a JSON response message and an HTTP status code.\n
             - If successful, the first element is a JSON response indicating success and a status code 200.
             - If the user creation fails, the first element is a JSON response indicating failure and a status code 500 or an error message.
 
@@ -713,7 +713,7 @@ def update_vote(app, DeviceID, voteType):
         voteType (str): The updated vote type.
 
     Returns:
-        tuple: A tuple containing a message and a boolean indicating success.
+        tuple: A tuple containing a message and a boolean indicating success.\n
             - If successful, returns a message string indicating successful vote update and True.
             - If the ESP is not assigned or an error occurs, returns an error message and False.
 
