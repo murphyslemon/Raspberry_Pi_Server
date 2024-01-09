@@ -171,9 +171,7 @@ def assignUserToESP():
         "espID": "INT"
     }
     """
-    print(request.json)
     try:
-
         data = request.json
 
         # Validate request.
