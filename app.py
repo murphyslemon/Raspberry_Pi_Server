@@ -168,7 +168,6 @@ def assignUserToESP():
     """Input JSON format:
     {
         "username": "TEXT",
-        "registrationDate": "YYY-MM-DD HH:MM:SS",
         "espID": "INT"
     }
     """
@@ -176,12 +175,12 @@ def assignUserToESP():
         data = request.json
 
         # Validate request.
-        if mqttImports.validateKeywordsInJSON(data, ['username', 'registrationDate', 'espID'], 1) == False:
+        if mqttImports.validateKeywordsInJSON(data, ['username', 'espID'], 1) == False:
             with open('log.txt', 'a') as logFile:
                 logFile.write(f'{datetime.now()}: assignUserToESP(), Invalid request.\n')
             return jsonify({'message': 'Invalid request.'}), 400
         
-        dbFunctions.assign_user_to_esp(app, data['username'], data['registrationDate'], data['espID'])
+        dbFunctions.assign_user_to_esp(app, data['username'], data['espID'])
     
         return jsonify({'message': 'User assigned to ESP.'}), 200
     

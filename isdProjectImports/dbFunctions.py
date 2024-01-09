@@ -21,10 +21,10 @@ class RegisteredESPs(db.Model):
 class Users(db.Model):
     __tablename__ = 'users'
     UserID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    Username = db.Column(db.Text, =True)
-    DeviceIndex = db.Column(db.Integer, db.ForeignKey('registeredesps.DeviceIndex'))
+    Username = db.Column(db.Text)
+    DeviceIndex = db.Column(db.Integer)
     RegistrationDate = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
-    registered_esp = db.relationship('RegisteredESPs', backref='users')
+    registered_esp = db.relationship('RegisteredESPs', foreign_keys=[DeviceIndex], backref='users')
 
 class Topics(db.Model):
     __tablename__ = 'topics'
@@ -41,6 +41,10 @@ class Votes(db.Model):
     VoteType = db.Column(db.Text, nullable=False)
     TopicID = db.Column(db.Integer, db.ForeignKey('topics.TopicID', ondelete='CASCADE'), nullable=False)
     VoteTime = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
+
+# Define relationships explicitly
+Users.DeviceIndex = db.Column(db.Integer, db.ForeignKey('registeredesps.DeviceIndex'))
+db.relationship(RegisteredESPs, backref='users')
 
 
 def get_registered_esps(app):
@@ -610,14 +614,13 @@ def create_topic(app, obj: voteHandling.VoteInformation):
             logFile.write(f'{datetime.now()}: dbFunctions.create_topic(), {str(errorMsg)}\n')
         return False
 
-# TODO: rework to handle existing users.
-def create_user(app, username, registrationDate):
+
+def create_user(app, username):
     """Create a new user in the database.
 
     Args:
         app: The Flask application object.
         username (str): The username of the new user.
-        registrationDate (datetime): The registration date of the new user.
 
     Returns:
         tuple: A tuple containing the registered user object and a boolean indicating success.
@@ -626,7 +629,7 @@ def create_user(app, username, registrationDate):
             - The second element is a boolean flag indicating success (True/False).
 
     Note:
-        - This function creates a new entry in the Users table with the provided username and registration date.
+        - This function creates a new entry in the Users table with the provided username.
         - It utilizes the Users model and commits changes to the database.
         - Returns a tuple containing the registered user object and a success flag.
             - If successful, returns the registered user object and True.
@@ -641,25 +644,25 @@ def create_user(app, username, registrationDate):
 
     try:
         with app.app_context():
-            user = Users(Username=username, RegistrationDate=registrationDate)
+            user = Users(Username=username)
             db.session.add(user)
             db.session.commit()
 
-            registered_user = Users.query.filter_by(Username=username, RegistrationDate=registrationDate).first()
+            # Fetch the latest entry for the user with the provided username
+            registered_user = Users.query.filter_by(Username=username).order_by(Users.UserID.desc()).first()
 
             return registered_user, True
 
     except Exception as errorMsg:
         return str(errorMsg), False
 
-# TODO: rework to handle existing users.
-def assign_user_to_esp(app, username, registrationDate, espID):
+
+def assign_user_to_esp(app, username, espID):
     """Assign a user to an ESP in the database.
 
     Args:
         app: The Flask application object.
         username (str): The username of the user to be assigned.
-        registrationDate (datetime): The registration date of the user.
         espID (str): The ID of the ESP to which the user will be assigned.
 
     Returns:
@@ -668,19 +671,18 @@ def assign_user_to_esp(app, username, registrationDate, espID):
             - If the user creation fails, the first element is a JSON response indicating failure and a status code 500 or an error message.
 
     Note:
-        - This function creates a new user in the Users table with the provided username and registration date.
-        - It then tries to assign the user to the specified ESP.
+        - This function tries to assign the user with the provided username to the specified ESP.
         - Returns a JSON response message with an HTTP status code indicating the outcome of the assignment process.
 
     Raises:
-        Exception: If an error occurs during user creation or assignment process.
+        Exception: If an error occurs during the assignment process.
     """
 
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.assign_user_to_esp()\n')
 
     # Create user in DB.
-    user, status = create_user(app, username, registrationDate)
+    user, status = create_user(app, username)
     print(user, status)
 
     if status == False:
