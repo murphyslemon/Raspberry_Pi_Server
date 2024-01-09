@@ -678,7 +678,7 @@ def assign_user_to_esp(app, username, espID):
         with app.app_context():
             # Verify the ESP exists.
             print(espID)
-            esp = RegisteredESPs.query.filter_by(DeviceID=espID).first()
+            esp = RegisteredESPs.query.filter_by(DeviceIndex=espID).first()
             if esp is None:
                 return jsonify({'message': 'ESP not found.'}), 404
             
@@ -691,7 +691,7 @@ def assign_user_to_esp(app, username, espID):
 
             # Assign user to ESP.
             esp.Assigned = True
-            user.DeviceIndex = esp.DeviceIndex
+            user.DeviceIndex = espID
             db.session.commit()
             return jsonify({'message': 'User assigned to ESP successfully.'}), 200
 
