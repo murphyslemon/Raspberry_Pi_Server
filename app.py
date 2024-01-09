@@ -184,8 +184,10 @@ def assignUserToESP():
     
         return jsonify({'message': 'User assigned to ESP.'}), 200
     
-    except:
-        return jsonify({'message': 'Invalid data.'}), 400 # TODO: change return message to something more descriptive.
+    except Exception as errorMsg:
+        with open('log.txt', 'a') as logFile:
+            logFile.write(f'{datetime.now()}: assignUserToESP(), Error: {errorMsg}\n')
+        return jsonify({'message': f'{str(errorMsg)}'}), 400 # TODO: change return message to something more descriptive.
 
 
 
