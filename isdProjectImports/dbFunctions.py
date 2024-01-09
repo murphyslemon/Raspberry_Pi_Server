@@ -695,7 +695,7 @@ def assign_user_to_esp(app, username, espID):
     except Exception as errorMsg:
         with open('log.txt', 'a') as logFile:
             logFile.write(f'{datetime.now()}: dbFunctions.assign_user_to_esp(), {str(errorMsg)}\n')
-        return str(errorMsg), False
+        return str(errorMsg), 500
     
 
 def update_vote(app, DeviceID, voteType):
