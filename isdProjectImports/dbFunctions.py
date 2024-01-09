@@ -673,23 +673,22 @@ def assign_user_to_esp(app, username, espID):
     with open('log.txt', 'a') as logFile:
         logFile.write(f'{datetime.now()}: Running dbFunctions.assign_user_to_esp()\n')
 
-    # Create user in DB.
-    user, status = create_user(app, username)
-    print(user, status)
-
-    if not status:
-        with open('log.txt', 'a') as logFile:
-            logFile.write(f'{datetime.now()}: dbFunctions.assign_user_to_esp(), failed to create user: "{user}"\n')
-        return jsonify({'message': 'Failed to create user.'}), 500
-
     # Assign user to ESP.
     try:
         with app.app_context():
+            # Verify the ESP exists.
             esp = RegisteredESPs.query.filter_by(DeviceID=espID).first()
-
             if esp is None:
                 return jsonify({'message': 'ESP not found.'}), 404
+            
+            # Create user in DB.
+            user, status = create_user(app, username)
+            if not status:
+                with open('log.txt', 'a') as logFile:
+                    logFile.write(f'{datetime.now()}: dbFunctions.assign_user_to_esp(), failed to create user: "{user}"\n')
+                return jsonify({'message': 'Failed to create user.'}), 500
 
+            # Assign user to ESP.
             esp.Assigned = True
             user.DeviceIndex = esp.DeviceIndex
             db.session.commit()
