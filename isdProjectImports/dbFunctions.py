@@ -691,10 +691,9 @@ def assign_user_to_esp(app, username, espID):
 
             # Assign user to ESP.
             esp.Assigned = True
-            user.DeviceIndex = esp.DeviceIndex
 
-            print(f"User's DeviceIndex: {user.DeviceIndex}")
-            print(f"ESP's DeviceIndex: {esp.DeviceIndex}")
+            # Force update the user's DeviceIndex.
+            db.session.execute(f"UPDATE Users SET DeviceIndex = {esp.DeviceIndex} WHERE UserID = {user.UserID}")
 
             db.session.commit()
             return jsonify({'message': 'User assigned to ESP successfully.'}), 200
