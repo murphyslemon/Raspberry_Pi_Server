@@ -172,17 +172,15 @@ def assignUserToESP():
     }
     """
     try:
-        
+        print(request.json)
         data = request.json
-        print("here")
+
         # Validate request.
         if mqttImports.validateKeywordsInJSON(data, ['username', 'espID'], 1) == False:
-            print("here2")
             with open('log.txt', 'a') as logFile:
                 logFile.write(f'{datetime.now()}: assignUserToESP(), Invalid request.\n')
             return jsonify({'message': 'Invalid request.'}), 400
         
-        print("here3")
         dbFunctions.assign_user_to_esp(app, data['username'], data['espID'])
     
         return jsonify({'message': 'User assigned to ESP.'}), 200
