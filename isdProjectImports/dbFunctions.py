@@ -24,7 +24,7 @@ class Users(db.Model):
     Username = db.Column(db.Text)
     DeviceIndex = db.Column(db.Integer)
     RegistrationDate = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
-    registered_esp = db.relationship('RegisteredESPs', foreign_keys=[DeviceIndex], backref='users')
+#    registered_esp = db.relationship('RegisteredESPs', foreign_keys=[DeviceIndex], backref='users')
 
 class Topics(db.Model):
     __tablename__ = 'topics'
@@ -43,8 +43,8 @@ class Votes(db.Model):
     VoteTime = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
 # Define relationships explicitly
-Users.DeviceIndex = db.Column(db.Integer, db.ForeignKey('registeredesps.DeviceIndex'))
-db.relationship(RegisteredESPs, backref='users')
+#Users.DeviceIndex = db.Column(db.Integer, db.ForeignKey('registeredesps.DeviceIndex'))
+#db.relationship(RegisteredESPs, backref='users')
 
 
 def get_registered_esps(app):
