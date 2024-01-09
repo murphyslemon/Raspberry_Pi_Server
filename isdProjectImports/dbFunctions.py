@@ -693,7 +693,7 @@ def assign_user_to_esp(app, username, espID):
             esp.Assigned = True
 
             # Force update the user's DeviceIndex.
-            update_query = text(f"UPDATE Users SET DeviceIndex = {esp.DeviceIndex} WHERE UserID = {user.UserID}")
+            update_query = f"UPDATE Users SET DeviceIndex = {esp.DeviceIndex} WHERE UserID = {user.UserID}"
             db.session.execute(update_query)
 
             db.session.commit()
