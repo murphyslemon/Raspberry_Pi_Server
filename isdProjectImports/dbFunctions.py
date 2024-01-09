@@ -677,6 +677,7 @@ def assign_user_to_esp(app, username, espID):
     try:
         with app.app_context():
             # Verify the ESP exists.
+            print(espID)
             esp = RegisteredESPs.query.filter_by(DeviceID=espID).first()
             if esp is None:
                 return jsonify({'message': 'ESP not found.'}), 404
