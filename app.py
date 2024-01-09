@@ -172,9 +172,9 @@ def assignUserToESP():
     }
     """
     try:
-        print("here")
+        
         data = request.json
-
+        print("here")
         # Validate request.
         if mqttImports.validateKeywordsInJSON(data, ['username', 'espID'], 1) == False:
             print("here2")
