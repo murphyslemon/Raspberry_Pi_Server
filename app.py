@@ -180,9 +180,7 @@ def assignUserToESP():
                 logFile.write(f'{datetime.now()}: assignUserToESP(), Invalid request.\n')
             return jsonify({'message': 'Invalid request.'}), 400
         
-        dbFunctions.assign_user_to_esp(app, data['username'], data['espID'])
-    
-        return jsonify({'message': 'User assigned to ESP.'}), 200
+        return dbFunctions.assign_user_to_esp(app, data['username'], data['espID'])
     
     except Exception as errorMsg:
         with open('log.txt', 'a') as logFile:
