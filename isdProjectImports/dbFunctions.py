@@ -325,15 +325,14 @@ def get_votes_by_user(app, userID):
         return jsonify(error_message), 500
 
 
-# Removes all data from the database.
 # DEBUG ONLY
 def clear_database(app):
     try:
         with app.app_context():
-            db.session.query(RegisteredESPs).delete()
-            db.session.query(Users).delete()
-            db.session.query(Topics).delete()
             db.session.query(Votes).delete()
+            db.session.query(Topics).delete()
+            db.session.query(Users).delete()
+            db.session.query(RegisteredESPs).delete()
             db.session.commit()
             return jsonify("Database cleared.")
 
@@ -342,7 +341,6 @@ def clear_database(app):
         return jsonify(error_message), 500
 
 
-# Initializes the database.
 # DEBUG ONLY
 def init_db(app):
     try:
@@ -356,14 +354,13 @@ def init_db(app):
         return jsonify(error_message), 500
 
 
-# Inserts test data into the database.
 # DEBUG ONLY
 def insert_data(app):
     try:
         with app.app_context():
             registered_esps_data = [
-                {'DeviceIndex': 1, 'DeviceID': 'ESP001', 'Assigned': True, 'Registered': True, 'MacAddress': '00:11:22:33:44:55'},
-                {'DeviceIndex': 2, 'DeviceID': 'ESP002', 'Assigned': False, 'Registered': True, 'MacAddress': 'AA:BB:CC:DD:EE:FF'}
+                {'DeviceID': 'ESP001', 'Registered': True, 'MacAddress': '00:11:22:33:44:55'},
+                {'DeviceID': 'ESP002', 'Registered': True, 'MacAddress': 'AA:BB:CC:DD:EE:FF'}
             ]
             for data in registered_esps_data:
                 registered_esp = RegisteredESPs(**data)
@@ -401,7 +398,7 @@ def insert_data(app):
     except Exception as errorMsg:
         error_message = {"error": str(errorMsg)}
         return jsonify(error_message), 500
-    
+
 
 def register_esp(app, mac_address):
     """Register an ESP by updating its DeviceID and Registered status in the database.
