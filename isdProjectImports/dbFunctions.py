@@ -14,6 +14,7 @@ class RegisteredESPs(db.Model):
     DeviceID = db.Column(db.String(255), unique=True, nullable=False)
     RegistrationTime = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
     LastActiveTime = db.Column(db.TIMESTAMP)
+    UserID = db.Column(db.Integer)
     Assigned = db.Column(db.Boolean, default=False)
     Registered = db.Column(db.Boolean, default=False)
     MacAddress = db.Column(db.String(255), unique=True)
@@ -21,8 +22,8 @@ class RegisteredESPs(db.Model):
 class Users(db.Model):
     __tablename__ = 'users'
     UserID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    Username = db.Column(db.Text)
     DeviceIndex = db.Column(db.Integer)
+    Username = db.Column(db.Text)
     RegistrationDate = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
 class Topics(db.Model):
@@ -36,10 +37,11 @@ class Topics(db.Model):
 class Votes(db.Model):
     __tablename__ = 'votes'
     VoteID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    UserID = db.Column(db.Integer, db.ForeignKey('users.UserID'), nullable=False)
+    UserID = db.Column(db.Integer, db.ForeignKey('registeredesps.UserID'))
     VoteType = db.Column(db.Text, nullable=False)
     TopicID = db.Column(db.Integer, db.ForeignKey('topics.TopicID', ondelete='CASCADE'), nullable=False)
     VoteTime = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
+
 
 
 def get_registered_esps(app):
@@ -371,17 +373,17 @@ def insert_data(app):
                 db.session.add(user)
 
             topics_data = [
-                {'Title': 'Topic 1', 'Description': 'Description for Topic 1', 'StartTime': '2023-01-01', 'EndTime': '2023-01-10'},
-                {'Title': 'Topic 2', 'Description': 'Description for Topic 2', 'StartTime': '2023-02-01', 'EndTime': '2023-02-15'}
+                {'Title': 'Topic 1', 'Description': 'Description for Topic 1', 'StartTime': '2023-01-01 10:00:00', 'EndTime': '2023-01-01 12:00:00'},
+                {'Title': 'Topic 2', 'Description': 'Description for Topic 2', 'StartTime': '2023-01-02 09:00:00', 'EndTime': '2023-01-02 11:00:00'}
             ]
             for data in topics_data:
                 topic = Topics(**data)
                 db.session.add(topic)
 
             votes_data = [
-                {'UserID': 1, 'VoteType': 'yes', 'TopicID': 1},
-                {'UserID': 2, 'VoteType': 'no', 'TopicID': 1},
-                {'UserID': 3, 'VoteType': 'yes', 'TopicID': 2}
+                {'UserID': 1, 'VoteType': 'Yes', 'TopicID': 1},
+                {'UserID': 2, 'VoteType': 'No', 'TopicID': 1},
+                {'UserID': 3, 'VoteType': 'Yes', 'TopicID': 2}
             ]
             for data in votes_data:
                 vote = Votes(**data)

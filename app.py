@@ -49,6 +49,7 @@ def handle_connect(client, userdata, flags, rc):
 
 
 # MQTT message handling
+# TODO: Figure out a way to move the case handling to their own functions.
 @mqttImports.mqtt.on_message()
 def handle_message(client, userdata, message):
     receivedMessage = message.payload.decode("utf-8")
@@ -65,6 +66,8 @@ def handle_message(client, userdata, message):
 
     # Handle received message based on topic.
     
+
+    # ESP registration handling.
     if receivedTopic.startswith("/registration/Server/") == True:
         with open('log.txt', 'a') as logFile:
             logFile.write(f'{datetime.now()}: mqtt.on_message(), received message on /registration/Server/\n')
@@ -91,6 +94,8 @@ def handle_message(client, userdata, message):
 
         return # Exit function.
 
+
+    # Vote handling.
     elif receivedTopic.startswith("/vote/") == True:
         with open('log.txt', 'a') as logFile:
             logFile.write(f'{datetime.now()}: mqtt.on_message(), received message on /vote/\n')
@@ -135,8 +140,8 @@ def createTopic():
     {
         "Title": "TEXT",
         "Description": "TEXT",
-        "StartTime": "YYY-MM-DD HH:MM:SS",
-        "EndTime": "YYY-MM-DD HH:MM:SS"
+        "StartTime": "YYYY-MM-DD HH:MM:SS",
+        "EndTime": "YYYY-MM-DD HH:MM:SS"
     }
     """
     try:
