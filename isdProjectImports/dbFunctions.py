@@ -695,6 +695,7 @@ def assign_user_to_esp(app, username, espID):
 
             # Assign user to ESP.
             esp.Assigned = True
+            esp.UserID = user.UserID
 
             db.session.commit()
             return jsonify({'message': 'User assigned to ESP successfully.'}), 200
