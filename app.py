@@ -146,6 +146,7 @@ def createTopic():
     """
     try:
         data = request.json
+        print(data)
         # Validate request.
         if mqttImports.validateKeywordsInJSON(data, ['Title', 'Description', 'StartTime', 'EndTime'], 1) == False:
             with open('log.txt', 'a') as logFile:
