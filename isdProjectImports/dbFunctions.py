@@ -517,6 +517,8 @@ def unregister_esp(app, device_index):
 
             if esp:
                 esp.Registered = False
+                esp.Assigned = False
+                esp.UserID = None
                 db.session.commit()
                 return esp, True #TODO: return something else than esp
             else:
@@ -556,6 +558,8 @@ def unregister_all_esps(app):
 
             for esp in registered_esps:
                 esp.Registered = False
+                esp.Assigned = False
+                esp.UserID = None
 
             db.session.commit()
 
