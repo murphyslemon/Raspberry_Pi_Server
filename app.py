@@ -185,7 +185,7 @@ def assignUserToESP():
     except Exception as errorMsg:
         with open('log.txt', 'a') as logFile:
             logFile.write(f'{datetime.now()}: assignUserToESP(), Error: {errorMsg}\n')
-        return jsonify({'message': f'{str(errorMsg)}'}), 400 # TODO: change return message to something more descriptive.
+        return jsonify({'message': f'{str(errorMsg)}'}), 400
 
 
 
