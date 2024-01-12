@@ -711,7 +711,7 @@ def assign_user_to_esp(app, username, espID):
 
     
 
-def update_vote(app, DeviceID, voteType):
+def update_vote(app, DeviceID, voteType, topicObject):
     """Update the vote type for a user associated with a specific ESP.
 
     Args:
@@ -739,7 +739,7 @@ def update_vote(app, DeviceID, voteType):
             esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
             
             if esp.Assigned:
-                user = Users.query.filter_by(DeviceIndex=esp.DeviceIndex).first()
+                user = Users.query.filter_by(UserID=esp.UserID).first()
                 vote = Votes.query.filter_by(UserID=user.UserID).first()
                 vote.VoteType = voteType
                 db.session.commit()
@@ -748,4 +748,38 @@ def update_vote(app, DeviceID, voteType):
                 return "ESP not assigned.", False
     except Exception as errorMsg:
         return str(errorMsg), False
+    
 
+def find_if_vote_exists(app, DeviceID, topicObject):
+    with app.app_context():
+        esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
+        vote = Votes.query.filter_by(UserID=esp.UserID, TopicID=topicObject.topicID).first()
+
+        if vote:
+            return True
+        else:
+            return False
+
+
+def create_vote(app, DeviceID, voteType, topicObject):
+
+    with open('log.txt', 'a') as logFile:
+        logFile.write(f'{datetime.now()}: Running dbFunctions.create_vote()\n')
+    
+    try:
+        with app.app_context():
+            esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
+            
+            # create vote if esp is assigned
+            if esp.Assigned:
+                user = Users.query.filter_by(UserID=esp.UserID).first()
+                vote = Votes(UserID=user.UserID, VoteType=voteType, TopicID=topicObject.topicID)
+                db.session.add(vote)
+                db.session.commit()
+                return "Vote created successfully.", True
+            else:
+                return "ESP not assigned.", False
+    except Exception as errorMsg:
+        with open('log.txt', 'a') as logFile:
+            logFile.write(f'{datetime.now()}: dbFunctions.create_vote(), {str(errorMsg)}\n')
+        return str(errorMsg), False

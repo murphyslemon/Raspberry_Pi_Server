@@ -92,7 +92,7 @@ def handle_message(client, userdata, message):
             with open('log.txt', 'a') as logFile:
                 logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP registration failed\n')
 
-        return # Exit function.
+        return # end of ESP registration handling.
 
 
     # Vote handling.
@@ -102,16 +102,22 @@ def handle_message(client, userdata, message):
 
         # Extract ESP ID from topic.
         deviceID = receivedTopic.split("/")[2]
-        # Update vote in database.
-        if globalVoteInformation.voteEndTime > datetime.now() and globalVoteInformation.voteStartTime < datetime.now():
-            dbFunctions.update_vote(deviceID, decodedMessage['vote'])
-            
-        else:
-            with open('log.txt', 'a') as logFile:
-                logFile.write(f'{datetime.now()}: mqtt.on_message(), vote not updated, vote is not active\n')
-            
 
-    return # Exit function.
+        # Test timing restrictions and if vote is for the correct topic.
+        if globalVoteInformation.voteEndTime < datetime.now() or globalVoteInformation.voteStartTime > datetime.now() or decodedMessage['VoteTitle'] == globalVoteInformation.voteTitle:
+            return # Vote is not active or vote is not for the correct topic, exit function.
+        
+        elif dbFunctions.find_if_vote_exists(app, globalVoteInformation.voteTitle) == False:
+            dbFunctions.create_vote(app, deviceID, decodedMessage['VoteType'], decodedMessage['VoteTitle'])
+            return # Exit function.
+
+        else:
+            dbFunctions.update_vote(app, deviceID, decodedMessage['VoteType'], decodedMessage['VoteTitle'])
+            return # Exit function.
+        
+        return # End of vote handling.
+
+    return # End of function.
 
 # API endpoints
 
@@ -146,7 +152,7 @@ def createTopic():
     """
     try:
         data = request.json
-        
+
         # Validate request.
         if mqttImports.validateKeywordsInJSON(data, ['Title', 'Description', 'StartTime', 'EndTime'], 1) == False:
             with open('log.txt', 'a') as logFile:
