@@ -107,8 +107,6 @@ def handle_message(client, userdata, message):
         vote_end_time = datetime.strptime(globalVoteInformation.voteEndTime, '%Y-%m-%d %H:%M:%S')
         vote_start_time = datetime.strptime(globalVoteInformation.voteStartTime, '%Y-%m-%d %H:%M:%S')
 
-        print(decodedMessage)
-        print(decodedMessage['VoteTitle'])
         # Test timing restrictions and if vote is for the correct topic.
         if (
             vote_end_time < datetime.now()
