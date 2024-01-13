@@ -773,12 +773,12 @@ def create_vote(app, DeviceID, voteType, topicObject):
                 vote = Votes(UserID=user.UserID, VoteType=voteType, TopicID=topicObject.topicID)
                 db.session.add(vote)
                 db.session.commit()
-                return "Vote created successfully.", True
+                return jsonify({'message': 'Vote created successfully.'}), 200
             else:
-                return "ESP not assigned.", False
+                return jsonify({'message': 'ESP not assigned.'}), 400
     except Exception as errorMsg:
         logHandler.log(f'Running dbFunctions.create_vote(), {str(errorMsg)}')
-        return str(errorMsg), False
+        return jsonify({'message': f'{str(errorMsg)}'}), 500
     
 
 def unassign_esp_with_id(app, espID):
@@ -809,13 +809,13 @@ def unassign_esp_with_id(app, espID):
                 esp.UserID = None
                 db.session.commit()
                 logHandler.log(f'dbFunctions.unassign_esp_with_id(), ESP{espID} unassigned.')
-                return "ESP unassigned.", True
+                return jsonify({'message': f'ESP{espID} unassigned.'}), 200
             else:
                 logHandler.log(f'dbFunctions.unassign_esp_with_id(), ESP{espID} not found in db.')
-                return "ESP not found.", False
+                return jsonify({'message': f'ESP{espID} not found in db.'}), 404
     except Exception as errorMsg:
         logHandler.log(f'dbFunctions.unassign_esp_with_id(), ERROR: {str(errorMsg)}')
-        return str(errorMsg), False
+        return jsonify({'message': f'{str(errorMsg)}'}), 500
 
 
 def unassign_all_esps(app):
@@ -845,10 +845,10 @@ def unassign_all_esps(app):
                 esp.UserID = None
             db.session.commit()
             logHandler.log(f'dbFunctions.unassign_all_esps(), All ESPs unassigned.')
-            return "All ESPs unassigned.", True
+            return jsonify({'message': 'All ESPs unassigned.'}), 200
     except Exception as errorMsg:
         logHandler.log(f'dbFunctions.unassign_all_esps(), ERROR: {str(errorMsg)}')
-        return str(errorMsg), False
+        return jsonify({'message': f'{str(errorMsg)}'}), 500
 
 
 def find_active_topic(app, vote_info_object):
@@ -880,12 +880,12 @@ def find_active_topic(app, vote_info_object):
                 vote_info_object.topicID = active_topic.TopicID
                 vote_info_object.updateVoteInformation(active_topic.Title, active_topic.Description, active_topic.StartTime, active_topic.EndTime)
                 logHandler.log(f'dbFunctions.find_active_topic(), Active topic found: {active_topic.Title}')
-                return f'Active topic found, topic name: {active_topic.title}', True
+                return True
             else:
                 # No active topic found
                 logHandler.log(f'dbFunctions.find_active_topic(), No active topic found.')
-                return f'No active topic found.', False
+                return False
     except Exception as errorMsg:
         # Handle exceptions, log or raise as needed
         logHandler.log(f'dbFunctions.find_active_topic(), ERROR: {str(errorMsg)}')
-        return str(errorMsg), False
+        return False
