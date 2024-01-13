@@ -49,6 +49,7 @@ def handle_connect(client, userdata, flags, rc):
 
 
 # MQTT message handling
+# TODO: Figure out a way to move the case handling to their own functions.
 @mqttImports.mqtt.on_message()
 def handle_message(client, userdata, message):
     receivedMessage = message.payload.decode("utf-8")
@@ -65,6 +66,8 @@ def handle_message(client, userdata, message):
 
     # Handle received message based on topic.
     
+
+    # ESP registration handling.
     if receivedTopic.startswith("/registration/Server/") == True:
         with open('log.txt', 'a') as logFile:
             logFile.write(f'{datetime.now()}: mqtt.on_message(), received message on /registration/Server/\n')
@@ -89,24 +92,44 @@ def handle_message(client, userdata, message):
             with open('log.txt', 'a') as logFile:
                 logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP registration failed\n')
 
-        return # Exit function.
+        return # end of ESP registration handling.
 
+
+    # Vote handling.
     elif receivedTopic.startswith("/vote/") == True:
         with open('log.txt', 'a') as logFile:
             logFile.write(f'{datetime.now()}: mqtt.on_message(), received message on /vote/\n')
 
         # Extract ESP ID from topic.
         deviceID = receivedTopic.split("/")[2]
-        # Update vote in database.
-        if globalVoteInformation.voteEndTime > datetime.now() and globalVoteInformation.voteStartTime < datetime.now():
-            dbFunctions.update_vote(deviceID, decodedMessage['vote'])
-            
-        else:
-            with open('log.txt', 'a') as logFile:
-                logFile.write(f'{datetime.now()}: mqtt.on_message(), vote not updated, vote is not active\n')
-            
 
-    return # Exit function.
+        # Convert strings to datetime objects
+        vote_end_time = datetime.strptime(globalVoteInformation.voteEndTime, '%Y-%m-%d %H:%M:%S')
+        vote_start_time = datetime.strptime(globalVoteInformation.voteStartTime, '%Y-%m-%d %H:%M:%S')
+
+        # Test timing restrictions and if vote is for the correct topic.
+        if (
+            vote_end_time < datetime.now()
+            or vote_start_time > datetime.now()
+            or decodedMessage['VoteTitle'] != globalVoteInformation.title
+        ):
+            with open('log.txt', 'a') as logFile:
+                logFile.write(f'{datetime.now()}: mqtt.on_message(), vote is not active or vote is not for the correct topic, exit function.\n')
+                logFile.write(f'{datetime.now()}: mqtt.on_message(), vote_end_time: {vote_end_time}, vote_start_time: {vote_start_time}, datetime.now(): {datetime.now()}\n')
+                logFile.write(f'{datetime.now()}: mqtt.on_message(), decodedMessage[\'VoteTitle\']: {decodedMessage["VoteTitle"]}, globalVoteInformation.title: {globalVoteInformation.title}\n')
+            return # Vote is not active or vote is not for the correct topic, exit function.
+        
+        elif dbFunctions.find_if_vote_exists(app, deviceID, globalVoteInformation) == False:
+            dbFunctions.create_vote(app, deviceID, decodedMessage['vote'], globalVoteInformation)
+            return # Exit function.
+
+        else:
+            dbFunctions.update_vote(app, deviceID, decodedMessage['vote'], globalVoteInformation)
+            return # Exit function.
+        
+        return # End of vote handling.
+
+    return # End of function.
 
 # API endpoints
 
@@ -135,12 +158,13 @@ def createTopic():
     {
         "Title": "TEXT",
         "Description": "TEXT",
-        "StartTime": "YYY-MM-DD HH:MM:SS",
-        "EndTime": "YYY-MM-DD HH:MM:SS"
+        "StartTime": "YYYY-MM-DD HH:MM:SS",
+        "EndTime": "YYYY-MM-DD HH:MM:SS"
     }
     """
     try:
         data = request.json
+
         # Validate request.
         if mqttImports.validateKeywordsInJSON(data, ['Title', 'Description', 'StartTime', 'EndTime'], 1) == False:
             with open('log.txt', 'a') as logFile:
@@ -185,7 +209,7 @@ def assignUserToESP():
     except Exception as errorMsg:
         with open('log.txt', 'a') as logFile:
             logFile.write(f'{datetime.now()}: assignUserToESP(), Error: {errorMsg}\n')
-        return jsonify({'message': f'{str(errorMsg)}'}), 400 # TODO: change return message to something more descriptive.
+        return jsonify({'message': f'{str(errorMsg)}'}), 400
 
 
 
