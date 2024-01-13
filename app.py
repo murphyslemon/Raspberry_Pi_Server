@@ -122,11 +122,11 @@ def handle_message(client, userdata, message):
             return # Vote is not active or vote is not for the correct topic, exit function.
         
         elif dbFunctions.find_if_vote_exists(app, deviceID, globalVoteInformation) == False:
-            dbFunctions.create_vote(app, deviceID, decodedMessage['vote'], decodedMessage['VoteTitle'])
+            dbFunctions.create_vote(app, deviceID, decodedMessage['vote'], globalVoteInformation)
             return # Exit function.
 
         else:
-            dbFunctions.update_vote(app, deviceID, decodedMessage['vote'], decodedMessage['VoteTitle'])
+            dbFunctions.update_vote(app, deviceID, decodedMessage['vote'], globalVoteInformation)
             return # Exit function.
         
         return # End of vote handling.
