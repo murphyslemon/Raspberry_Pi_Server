@@ -113,6 +113,8 @@ def handle_message(client, userdata, message):
             or vote_start_time > datetime.now()
             or decodedMessage['VoteTitle'] == globalVoteInformation.title
         ):
+            with open('log.txt', 'a') as logFile:
+                logFile.write(f'{datetime.now()}: mqtt.on_message(), vote is not active or vote is not for the correct topic, exit function.\n')
             return # Vote is not active or vote is not for the correct topic, exit function.
         
         elif dbFunctions.find_if_vote_exists(app, globalVoteInformation.voteTitle) == False:
