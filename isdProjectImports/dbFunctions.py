@@ -793,3 +793,67 @@ def create_vote(app, DeviceID, voteType, topicObject):
     except Exception as errorMsg:
         logHandler.log(f'Running dbFunctions.create_vote(), {str(errorMsg)}')
         return str(errorMsg), False
+    
+
+def unassign_esp_with_id(espID):
+    """
+    Unassign an ESP with the specified ID in the database.
+
+    Args:
+        - espID (int): The unique identifier of the ESP to be unassigned.
+
+    Returns:
+        tuple: A tuple containing a message and a boolean indicating success.\n
+            - If the unassignment is successful, returns a message string indicating success and True.
+            - If the ESP is not found in the database or an error occurs, returns an error message and False.
+
+    Note:
+        - This function attempts to unassign an ESP by setting its 'Assigned' status to False and 'UserID' to None.
+        - Retrieves the ESP information based on the provided ESP ID.
+        - Returns a tuple with a message indicating the success or failure of the unassignment process and a boolean value.
+    """
+
+    logHandler.log(f'Running dbFunctions.unassign_esp_with_id()')
+    try:
+        esp = RegisteredESPs.query.filter_by(DeviceIndex=espID).first()
+        if esp:
+            esp.Assigned = False
+            esp.UserID = None
+            db.session.commit()
+            logHandler.log(f'dbFunctions.unassign_esp_with_id(), ESP{espID} unassigned.')
+            return "ESP unassigned.", True
+        else:
+            logHandler.log(f'dbFunctions.unassign_esp_with_id(), ESP{espID} not found in db.')
+            return "ESP not found.", False
+    except Exception as errorMsg:
+        logHandler.log(f'dbFunctions.unassign_esp_with_id(), ERROR: {str(errorMsg)}')
+        return str(errorMsg), False
+
+
+def unassign_all_esps():
+    """
+    Unassign all ESP devices in the database.
+
+    Returns:
+        tuple: A tuple containing a message and a boolean indicating success.\n
+            - If the unassignment is successful, returns a message string indicating success and True.
+            - If an error occurs during the unassignment process, returns an error message and False.
+
+    Note:
+        - This function attempts to unassign all ESP devices in the database by setting their Assigned status to False.
+        - Commits changes to the database after updating each ESP.
+        - Returns a tuple with a message indicating the success or failure of the unassignment process and a boolean value.
+    """
+    
+    logHandler.log(f'Running dbFunctions.unassign_all_esps()')
+    try:
+        registered_esps = RegisteredESPs.query.all()
+        for esp in registered_esps:
+            esp.Assigned = False
+            esp.UserID = None
+        db.session.commit()
+        logHandler.log(f'dbFunctions.unassign_all_esps(), All ESPs unassigned.')
+        return "All ESPs unassigned.", True
+    except Exception as errorMsg:
+        logHandler.log(f'dbFunctions.unassign_all_esps(), ERROR: {str(errorMsg)}')
+        return str(errorMsg), False
