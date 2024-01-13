@@ -212,4 +212,4 @@ if __name__ == '__main__':
     # Log DB boot info to log file.
     logHandler.log(f'Server started.')
 
-    # TODO: Create a function for adding logs to log file to remove the repetetive code.
+    dbFunctions.find_active_topic(app, globalVoteInformation)

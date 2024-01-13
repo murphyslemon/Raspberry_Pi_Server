@@ -67,7 +67,6 @@ def get_registered_esps(app):
     """
 
     logHandler.log(f'Running dbFunctions.get_registered_esps()')
-
     try:
         with app.app_context():
             registered_esps = (
@@ -121,7 +120,6 @@ def get_all_esps(app):
     """
 
     logHandler.log(f'Running dbFunctions.get_all_esps()')
-
     try:
         with app.app_context():
             registered_esps = RegisteredESPs.query.all()
@@ -167,7 +165,6 @@ def get_all_topics(app):
     """
 
     logHandler.log(f'Running dbFunctions.get_all_topics()')
-
     try:
         with app.app_context():
             topics = Topics.query.all()
@@ -212,7 +209,6 @@ def get_topic(app, topicID):
     """
 
     logHandler.log(f'Running dbFunctions.get_topic()')
-
     try:
         with app.app_context():
             topic = Topics.query.filter_by(TopicID=topicID).first()
@@ -254,7 +250,6 @@ def get_votes(app, topicID):
     """
 
     logHandler.log(f'Running dbFunctions.get_votes()')
-
     try:
         with app.app_context():
             votes = Votes.query.filter_by(TopicID=topicID).all()
@@ -299,7 +294,6 @@ def get_votes_by_user(app, userID):
     """
 
     logHandler.log(f'Running dbFunctions.get_votes_by_user()')
-
     try:
         with app.app_context():
             votes = Votes.query.filter_by(UserID=userID).all()
@@ -419,7 +413,6 @@ def register_esp(app, mac_address):
     """
 
     logHandler.log(f'Running dbFunctions.register_esp()')
-
     try:
         with app.app_context():
             registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
@@ -465,7 +458,6 @@ def add_esp(app, mac_address):
     """
 
     logHandler.log(f'Running dbFunctions.add_esp()')
-
     try:
         with app.app_context():
             add_esp = RegisteredESPs(MacAddress=mac_address, Registered=True, DeviceID=str(uuid.uuid4()))
@@ -502,7 +494,6 @@ def unregister_esp(app, device_index):
     """
 
     logHandler.log(f'Running dbFunctions.unregister_esp()')
-
     try:
         with app.app_context():
             esp = RegisteredESPs.query.get(device_index)
@@ -542,7 +533,6 @@ def unregister_all_esps(app):
     """
 
     logHandler.log(f'Running dbFunctions.unregister_all_esps()')
-
     try:
         with app.app_context():
             registered_esps = RegisteredESPs.query.all()
@@ -586,7 +576,6 @@ def create_topic(app, obj: voteHandling.VoteInformation):
     """
 
     logHandler.log(f'Running dbFunctions.create_topic()')
-
     try:
         with app.app_context():
             topic = Topics(Title=obj.title, Description=obj.description, StartTime=obj.voteStartTime, EndTime=obj.voteEndTime)
@@ -629,7 +618,6 @@ def create_user(app, username, espID):
     """
 
     logHandler.log(f'Running dbFunctions.create_user()')
-
     try:
         with app.app_context():
             user = Users(Username=username, DeviceIndex=espID)
@@ -668,7 +656,6 @@ def assign_user_to_esp(app, username, espID):
     """
 
     logHandler.log(f'Running dbFunctions.assign_user_to_esp()')
-
     # Assign user to ESP.
     try:
         with app.app_context():
@@ -718,7 +705,6 @@ def update_vote(app, DeviceID, voteType, topicObject):
     """
 
     logHandler.log(f'Running dbFunctions.update_vote()')
-
     try:
         with app.app_context():
             esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
@@ -748,6 +734,7 @@ def find_if_vote_exists(app, DeviceID, topicObject):
     - bool: True if a vote exists for the specified ESP and topic, False otherwise.
     """
 
+    logHandler.log(f'Running dbFunctions.find_if_vote_exists()')
     with app.app_context():
         esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
         vote = Votes.query.filter_by(UserID=esp.UserID, TopicID=topicObject.topicID).first()
@@ -776,7 +763,6 @@ def create_vote(app, DeviceID, voteType, topicObject):
     """
 
     logHandler.log(f'Running dbFunctions.create_vote()')
-    
     try:
         with app.app_context():
             esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
@@ -795,12 +781,13 @@ def create_vote(app, DeviceID, voteType, topicObject):
         return str(errorMsg), False
     
 
-def unassign_esp_with_id(espID):
+def unassign_esp_with_id(app, espID):
     """
     Unassign an ESP with the specified ID in the database.
 
     Args:
-        - espID (int): The unique identifier of the ESP to be unassigned.
+        app: The Flask application object.
+        espID (int): The unique identifier of the ESP to be unassigned.
 
     Returns:
         tuple: A tuple containing a message and a boolean indicating success.\n
@@ -815,24 +802,28 @@ def unassign_esp_with_id(espID):
 
     logHandler.log(f'Running dbFunctions.unassign_esp_with_id()')
     try:
-        esp = RegisteredESPs.query.filter_by(DeviceIndex=espID).first()
-        if esp:
-            esp.Assigned = False
-            esp.UserID = None
-            db.session.commit()
-            logHandler.log(f'dbFunctions.unassign_esp_with_id(), ESP{espID} unassigned.')
-            return "ESP unassigned.", True
-        else:
-            logHandler.log(f'dbFunctions.unassign_esp_with_id(), ESP{espID} not found in db.')
-            return "ESP not found.", False
+        with app.app_context():
+            esp = RegisteredESPs.query.filter_by(DeviceIndex=espID).first()
+            if esp:
+                esp.Assigned = False
+                esp.UserID = None
+                db.session.commit()
+                logHandler.log(f'dbFunctions.unassign_esp_with_id(), ESP{espID} unassigned.')
+                return "ESP unassigned.", True
+            else:
+                logHandler.log(f'dbFunctions.unassign_esp_with_id(), ESP{espID} not found in db.')
+                return "ESP not found.", False
     except Exception as errorMsg:
         logHandler.log(f'dbFunctions.unassign_esp_with_id(), ERROR: {str(errorMsg)}')
         return str(errorMsg), False
 
 
-def unassign_all_esps():
+def unassign_all_esps(app):
     """
     Unassign all ESP devices in the database.
+
+    Args:
+        app: The Flask application object.
 
     Returns:
         tuple: A tuple containing a message and a boolean indicating success.\n
@@ -844,16 +835,57 @@ def unassign_all_esps():
         - Commits changes to the database after updating each ESP.
         - Returns a tuple with a message indicating the success or failure of the unassignment process and a boolean value.
     """
-    
+
     logHandler.log(f'Running dbFunctions.unassign_all_esps()')
     try:
-        registered_esps = RegisteredESPs.query.all()
-        for esp in registered_esps:
-            esp.Assigned = False
-            esp.UserID = None
-        db.session.commit()
-        logHandler.log(f'dbFunctions.unassign_all_esps(), All ESPs unassigned.')
-        return "All ESPs unassigned.", True
+        with app.app_context():
+            registered_esps = RegisteredESPs.query.all()
+            for esp in registered_esps:
+                esp.Assigned = False
+                esp.UserID = None
+            db.session.commit()
+            logHandler.log(f'dbFunctions.unassign_all_esps(), All ESPs unassigned.')
+            return "All ESPs unassigned.", True
     except Exception as errorMsg:
         logHandler.log(f'dbFunctions.unassign_all_esps(), ERROR: {str(errorMsg)}')
+        return str(errorMsg), False
+
+
+def find_active_topic(app, vote_info_object):
+    """
+    Find an active topic in the database and update the provided VoteInformation object.
+
+    Args:
+        app: The Flask application object.
+        vote_info_object (VoteInformation): An object containing information about the vote.
+
+    Returns:
+        tuple: A tuple containing a message and a boolean value indicating the result.
+            - If an active topic is found and updated in the VoteInformation object, returns a success message and True.
+            - If no active topic is found, returns a message indicating so and False.
+            - In case of an exception, returns the error message as a string and False.
+    """
+
+    logHandler.log(f'Running dbFunctions.find_active_topic()')
+    try:
+        with app.app_context():
+            # Get the current timestamp
+            current_time = datetime.now()
+
+            # Query the database to find an active topic
+            active_topic = Topics.query.filter(Topics.StartTime <= current_time, Topics.EndTime >= current_time).first()
+
+            if active_topic:
+                # Update the VoteInformation object with the information from the active topic
+                vote_info_object.topicID = active_topic.TopicID
+                vote_info_object.updateVoteInformation(active_topic.Title, active_topic.Description, active_topic.StartTime, active_topic.EndTime)
+                logHandler.log(f'dbFunctions.find_active_topic(), Active topic found: {active_topic.Title}')
+                return f'Active topic found, topic name: {active_topic.title}', True
+            else:
+                # No active topic found
+                logHandler.log(f'dbFunctions.find_active_topic(), No active topic found.')
+                return f'No active topic found.', False
+    except Exception as errorMsg:
+        # Handle exceptions, log or raise as needed
+        logHandler.log(f'dbFunctions.find_active_topic(), ERROR: {str(errorMsg)}')
         return str(errorMsg), False
