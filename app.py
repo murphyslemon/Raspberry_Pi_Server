@@ -119,7 +119,7 @@ def handle_message(client, userdata, message):
                 logFile.write(f'{datetime.now()}: mqtt.on_message(), decodedMessage[\'VoteTitle\']: {decodedMessage["VoteTitle"]}, globalVoteInformation.title: {globalVoteInformation.title}\n')
             return # Vote is not active or vote is not for the correct topic, exit function.
         
-        elif dbFunctions.find_if_vote_exists(app, globalVoteInformation.title) == False:
+        elif dbFunctions.find_if_vote_exists(app, deviceID, decodedMessage['VoteType'], globalVoteInformation) == False:
             dbFunctions.create_vote(app, deviceID, decodedMessage['VoteType'], decodedMessage['VoteTitle'])
             return # Exit function.
 
