@@ -8,7 +8,7 @@ log_folder = "Logs/"
 # Initialize the log file.
 with open(log_folder + current_logfile_name, 'w') as logFile:
     logFile.write(f'Timestamp format: DD-MM-YYYY  HH-MM-SS:\n')
-    logFile.write(f'Log file created at: {datetime.now()}\n')
+    logFile.write(f'Log file created at: {datetime.now().strftime("%d-%m-%Y  %H-%M-%S")}\n')
 
 
 def log(message):
