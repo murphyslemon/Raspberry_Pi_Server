@@ -199,8 +199,27 @@ def assignUserToESP():
         return jsonify({'message': f'{str(errorMsg)}'}), 400
 
 
+# Unassign ESP
+@app.route('/api/unassignESP', methods=['POST'])
+def unassignESP():
+    """Input JSON format:
+    {
+        "espID": "INT"
+    }
+    """
+    try:
+        data = request.json
 
-
+        # Validate request.
+        if mqttImports.validateKeywordsInJSON(data, ['espID'], 1) == False:
+            logHandler.log(f'unassignESP(), Invalid request.')
+            return jsonify({'message': 'Invalid request.'}), 400
+        
+        return dbFunctions.unassign_esp_with_id(app, data['espID'])
+    
+    except Exception as errorMsg:
+        logHandler.log(f'unassignESP(), Error: {errorMsg}')
+        return jsonify({'message': f'{str(errorMsg)}'}), 500
 
 if __name__ == '__main__':
     # Initialize imported app extensions.
