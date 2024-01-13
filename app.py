@@ -103,8 +103,16 @@ def handle_message(client, userdata, message):
         # Extract ESP ID from topic.
         deviceID = receivedTopic.split("/")[2]
 
+        # Convert strings to datetime objects
+        vote_end_time = datetime.strptime(globalVoteInformation.voteEndTime, '%Y-%m-%d %H:%M:%S')
+        vote_start_time = datetime.strptime(globalVoteInformation.voteStartTime, '%Y-%m-%d %H:%M:%S')
+
         # Test timing restrictions and if vote is for the correct topic.
-        if globalVoteInformation.voteEndTime < datetime.now() or globalVoteInformation.voteStartTime > datetime.now() or decodedMessage['VoteTitle'] == globalVoteInformation.voteTitle:
+        if (
+            vote_end_time < datetime.now()
+            or vote_start_time > datetime.now()
+            or decodedMessage['VoteTitle'] == globalVoteInformation.voteTitle
+        ):
             return # Vote is not active or vote is not for the correct topic, exit function.
         
         elif dbFunctions.find_if_vote_exists(app, globalVoteInformation.voteTitle) == False:
