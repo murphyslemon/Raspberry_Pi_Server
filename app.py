@@ -111,7 +111,7 @@ def handle_message(client, userdata, message):
         if (
             vote_end_time < datetime.now()
             or vote_start_time > datetime.now()
-            or decodedMessage['VoteTitle'] == globalVoteInformation.voteTitle
+            or decodedMessage['VoteTitle'] == globalVoteInformation.title
         ):
             return # Vote is not active or vote is not for the correct topic, exit function.
         
