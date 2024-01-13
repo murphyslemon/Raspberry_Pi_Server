@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask import jsonify
-from isdProjectImports import esp
+from isdProjectImports import logHandler
 from isdProjectImports import voteHandling
 from collections import defaultdict
 import uuid
@@ -66,8 +66,7 @@ def get_registered_esps(app):
         - JSON: A JSON response with an error message and a status code 500 in case of an exception.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.get_registered_esps()\n')
+    logHandler.log(f'Running dbFunctions.get_registered_esps()')
 
     try:
         with app.app_context():
@@ -121,8 +120,7 @@ def get_all_esps(app):
         - JSON: A JSON response with an error message and a status code 500 in case of an exception.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.get_all_esps()\n')
+    logHandler.log(f'Running dbFunctions.get_all_esps()')
 
     try:
         with app.app_context():
@@ -168,8 +166,7 @@ def get_all_topics(app):
         - JSON: A JSON response with an error message and a status code 500 in case of an exception.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.get_all_topics()\n')
+    logHandler.log(f'Running dbFunctions.get_all_topics()')
 
     try:
         with app.app_context():
@@ -214,8 +211,7 @@ def get_topic(app, topicID):
         - JSON: A JSON response with an error message and a status code 500 in case of an exception.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.get_topic()\n')
+    logHandler.log(f'Running dbFunctions.get_topic()')
 
     try:
         with app.app_context():
@@ -257,8 +253,7 @@ def get_votes(app, topicID):
         - JSON: A JSON response with an error message and a status code 500 in case of an exception.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.get_votes()\n')
+    logHandler.log(f'Running dbFunctions.get_votes()')
 
     try:
         with app.app_context():
@@ -303,8 +298,7 @@ def get_votes_by_user(app, userID):
         - JSON: A JSON response with an error message and a status code 500 in case of an exception.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.get_votes_by_user()\n')
+    logHandler.log(f'Running dbFunctions.get_votes_by_user()')
 
     try:
         with app.app_context():
@@ -424,8 +418,7 @@ def register_esp(app, mac_address):
         - JSON: A JSON response with an error message and a status code 500 in case of an exception.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.register_esp()\n')
+    logHandler.log(f'Running dbFunctions.register_esp()')
 
     try:
         with app.app_context():
@@ -442,8 +435,7 @@ def register_esp(app, mac_address):
                 return registered_esp, True
 
             else:
-                with open('log.txt', 'a') as logFile:
-                    logFile.write(f'{datetime.now()}: dbFunctions.register_esp(), ESP not found with the given MacAddress\n')
+                logHandler.log(f'Running dbFunctions.register_esp(), ESP not found with the given MAC address.')
                 return add_esp(app, mac_address)
 
     except Exception as errorMsg:
@@ -472,8 +464,7 @@ def add_esp(app, mac_address):
         - Exception: If an error occurs during the registration process.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.add_esp()\n')
+    logHandler.log(f'Running dbFunctions.add_esp()')
 
     try:
         with app.app_context():
@@ -510,8 +501,7 @@ def unregister_esp(app, device_index):
         - Exception: If an error occurs during the ESPs unregistering process.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.unregister_esp()\n')
+    logHandler.log(f'Running dbFunctions.unregister_esp()')
 
     try:
         with app.app_context():
@@ -551,8 +541,7 @@ def unregister_all_esps(app):
         - Exception: If an error occurs during the ESPs unregistering process.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.unregister_all_esps()\n')
+    logHandler.log(f'Running dbFunctions.unregister_all_esps()')
 
     try:
         with app.app_context():
@@ -596,8 +585,7 @@ def create_topic(app, obj: voteHandling.VoteInformation):
         - Exception: If an error occurs during the topic creation process.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.create_topic()\n')
+    logHandler.log(f'Running dbFunctions.create_topic()')
 
     try:
         with app.app_context():
@@ -610,8 +598,7 @@ def create_topic(app, obj: voteHandling.VoteInformation):
             return  True
 
     except Exception as errorMsg:
-        with open('log.txt', 'a') as logFile:
-            logFile.write(f'{datetime.now()}: dbFunctions.create_topic(), {str(errorMsg)}\n')
+        logHandler.log(f'Running dbFunctions.create_topic(), {str(errorMsg)}')
         return False
 
 
@@ -641,8 +628,7 @@ def create_user(app, username, espID):
         - Exception: If an error occurs during the user creation process.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.create_user()\n')
+    logHandler.log(f'Running dbFunctions.create_user()')
 
     try:
         with app.app_context():
@@ -681,8 +667,7 @@ def assign_user_to_esp(app, username, espID):
     - Exception: If an error occurs during the assignment process.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.assign_user_to_esp()\n')
+    logHandler.log(f'Running dbFunctions.assign_user_to_esp()')
 
     # Assign user to ESP.
     try:
@@ -695,8 +680,7 @@ def assign_user_to_esp(app, username, espID):
             # Create user in DB.
             user, status = create_user(app, username, espID)
             if not status:
-                with open('log.txt', 'a') as logFile:
-                    logFile.write(f'{datetime.now()}: dbFunctions.assign_user_to_esp(), failed to create user: "{user}"\n')
+                logHandler.log(f'Running dbFunctions.assign_user_to_esp(), Failed to create user.')
                 return jsonify({'message': 'Failed to create user.'}), 500
 
             # Assign user to ESP.
@@ -707,8 +691,7 @@ def assign_user_to_esp(app, username, espID):
             return jsonify({'message': 'User assigned to ESP successfully.'}), 200
 
     except Exception as errorMsg:
-        with open('log.txt', 'a') as logFile:
-            logFile.write(f'{datetime.now()}: dbFunctions.assign_user_to_esp(), {str(errorMsg)}\n')
+        logHandler.log(f'Running dbFunctions.assign_user_to_esp(), {str(errorMsg)}')
         return str(errorMsg), 500
 
     
@@ -734,8 +717,7 @@ def update_vote(app, DeviceID, voteType, topicObject):
     - Returns a message indicating the success or failure of the vote update process.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.update_vote()\n')
+    logHandler.log(f'Running dbFunctions.update_vote()')
 
     try:
         with app.app_context():
@@ -793,8 +775,7 @@ def create_vote(app, DeviceID, voteType, topicObject):
     Handles exceptions and returns appropriate messages regarding the success or failure of creating a vote.
     """
 
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Running dbFunctions.create_vote()\n')
+    logHandler.log(f'Running dbFunctions.create_vote()')
     
     try:
         with app.app_context():
@@ -810,6 +791,5 @@ def create_vote(app, DeviceID, voteType, topicObject):
             else:
                 return "ESP not assigned.", False
     except Exception as errorMsg:
-        with open('log.txt', 'a') as logFile:
-            logFile.write(f'{datetime.now()}: dbFunctions.create_vote(), {str(errorMsg)}\n')
+        logHandler.log(f'Running dbFunctions.create_vote(), {str(errorMsg)}')
         return str(errorMsg), False
