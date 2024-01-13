@@ -790,7 +790,7 @@ def unassign_esp_with_id(app, espID):
         espID (int): The unique identifier of the ESP to be unassigned.
 
     Returns:
-        tuple: A tuple containing a message and a boolean indicating success.\n
+        - tuple: A tuple containing a message and a boolean indicating success.
             - If the unassignment is successful, returns a message string indicating success and True.
             - If the ESP is not found in the database or an error occurs, returns an error message and False.
 
@@ -826,7 +826,7 @@ def unassign_all_esps(app):
         app: The Flask application object.
 
     Returns:
-        tuple: A tuple containing a message and a boolean indicating success.\n
+        - tuple: A tuple containing a message and a boolean indicating success.
             - If the unassignment is successful, returns a message string indicating success and True.
             - If an error occurs during the unassignment process, returns an error message and False.
 
@@ -860,7 +860,7 @@ def find_active_topic(app, vote_info_object):
         vote_info_object (VoteInformation): An object containing information about the vote.
 
     Returns:
-        tuple: A tuple containing a message and a boolean value indicating the result.
+        - tuple: A tuple containing a message and a boolean value indicating the result.
             - If an active topic is found and updated in the VoteInformation object, returns a success message and True.
             - If no active topic is found, returns a message indicating so and False.
             - In case of an exception, returns the error message as a string and False.
