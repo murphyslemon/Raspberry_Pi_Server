@@ -36,6 +36,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 def index():
     return 'Flask MQTT Server is running!'
 
+
 # Subscribe to all topics in 'initialSubscribeTopics' list when server is started.
 @mqttImports.mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
@@ -121,6 +122,7 @@ def handle_message(client, userdata, message):
         return # End of vote handling.
 
     return # End of function.
+
 
 # API endpoints
 
@@ -220,6 +222,13 @@ def unassignESP():
     except Exception as errorMsg:
         logHandler.log(f'unassignESP(), Error: {errorMsg}')
         return jsonify({'message': f'{str(errorMsg)}'}), 500
+
+
+# Unassing all ESPs
+@app.route('/api/unassignAllESPs', methods=['UPDATE'])
+def unassignAllESPs():
+    return dbFunctions.unassign_all_esps(app)
+
 
 if __name__ == '__main__':
     # Initialize imported app extensions.
