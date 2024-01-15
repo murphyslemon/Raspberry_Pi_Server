@@ -8,6 +8,7 @@ from isdProjectImports import credentials
 from isdProjectImports import mqttImports
 from isdProjectImports import dbFunctions
 from isdProjectImports import voteHandling
+from isdProjectImports import logHandler
 
 mqttBrokerPort = 1883
 mqttKeepAliveSec = 10
@@ -35,17 +36,16 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 def index():
     return 'Flask MQTT Server is running!'
 
+
 # Subscribe to all topics in 'initialSubscribeTopics' list when server is started.
 @mqttImports.mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
    if rc == 0:
        for topic in mqttImports.initialSubscribeTopics:
-           mqttImports.mqtt.subscribe(topic, qos=1)  # subscribe to each topic
-           with open('log.txt', 'a') as logFile:
-               logFile.write(f'{datetime.now()}: mqtt.on_connect(), subscribed to topic: {topic}\n')
+            mqttImports.mqtt.subscribe(topic, qos=1)  # subscribe to each topic
+            logHandler.log(f'handle_message(), Subscribed to topic: {topic}')
    else:
-       with open('log.txt', 'a') as logFile:
-           logFile.write(f'{datetime.now()}: mqtt.on_connect(), connection failed\n')
+        logHandler.log(f'handle_message(), Connection failed with result code {str(rc)}')
 
 
 # MQTT message handling
@@ -54,14 +54,12 @@ def handle_connect(client, userdata, flags, rc):
 def handle_message(client, userdata, message):
     receivedMessage = message.payload.decode("utf-8")
     receivedTopic = message.topic
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: mqtt.on_message(), received message: {receivedMessage} on topic: {receivedTopic}\n')
+    logHandler.log(f'handle_message(), Received message: {receivedMessage} on topic: {receivedTopic}')
 
     # Decode JSON message.
     decodedMessage = mqttImports.decodeStringToJSON(receivedMessage)
     if decodedMessage == -1:
-        with open('log.txt', 'a') as logFile:
-            logFile.write(f'{datetime.now()}: mqtt.on_message(), JSON decode failed\n')
+        logHandler.log(f'JSON decode failed.')
         return # TODO: maybe add something to notify ESPs about failed JSON decode.
 
     # Handle received message based on topic.
@@ -69,8 +67,7 @@ def handle_message(client, userdata, message):
 
     # ESP registration handling.
     if receivedTopic.startswith("/registration/Server/") == True:
-        with open('log.txt', 'a') as logFile:
-            logFile.write(f'{datetime.now()}: mqtt.on_message(), received message on /registration/Server/\n')
+        logHandler.log(f'handle_message(), Message handling going to ESP registration handling path.')
 
         # Extract ESP MAC address from topic.
         macAddress = receivedTopic.split("/")[3]
@@ -83,22 +80,18 @@ def handle_message(client, userdata, message):
             # return uniqueID to ESP.
             mqttImports.mqtt.publish(f'/registration/esp/{macAddress}', f'{{"VotingID":"{registeredESP.DeviceID}"}}', qos=1)
             mqttImports.mqtt.subscribe(f'/registration/ESP/{registeredESP.DeviceID}', qos=1) # Subscribe to ESP's uniqueID topic.
-
-            with open('log.txt', 'a') as logFile:
-                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP registration successful, ESP uniqueID: {registeredESP.DeviceID}, ESP MAC address: {registeredESP.MacAddress}\n')
+            logHandler.log(f'handle_message(), ESP registration successful, ESP uniqueID: {registeredESP.DeviceID}, ESP MAC address: {registeredESP.MacAddress}\n')
 
         else:
             #TODO: add something to notify ESP about failed registration.
-            with open('log.txt', 'a') as logFile:
-                logFile.write(f'{datetime.now()}: mqtt.on_message(), ESP registration failed\n')
+            logHandler.log(f'handle_message(), ESP registration failed, ESP MAC address: {macAddress}\n')
 
         return # end of ESP registration handling.
 
 
     # Vote handling.
     elif receivedTopic.startswith("/vote/") == True:
-        with open('log.txt', 'a') as logFile:
-            logFile.write(f'{datetime.now()}: mqtt.on_message(), received message on /vote/\n')
+        logHandler.log(f'handle_message(), Message handling going to vote handling path.')
 
         # Extract ESP ID from topic.
         deviceID = receivedTopic.split("/")[2]
@@ -113,10 +106,9 @@ def handle_message(client, userdata, message):
             or vote_start_time > datetime.now()
             or decodedMessage['VoteTitle'] != globalVoteInformation.title
         ):
-            with open('log.txt', 'a') as logFile:
-                logFile.write(f'{datetime.now()}: mqtt.on_message(), vote is not active or vote is not for the correct topic, exit function.\n')
-                logFile.write(f'{datetime.now()}: mqtt.on_message(), vote_end_time: {vote_end_time}, vote_start_time: {vote_start_time}, datetime.now(): {datetime.now()}\n')
-                logFile.write(f'{datetime.now()}: mqtt.on_message(), decodedMessage[\'VoteTitle\']: {decodedMessage["VoteTitle"]}, globalVoteInformation.title: {globalVoteInformation.title}\n')
+            logHandler.log(f'handle_message(), vote is not active or vote is not for the correct topic, exit function.')
+            logHandler.log(f'handle_message(), vote_end_time: {vote_end_time}, vote_start_time: {vote_start_time}, datetime.now(): {datetime.now()}')
+            logHandler.log(f'handle_message(), decodedMessage[\'VoteTitle\']: {decodedMessage["VoteTitle"]}, globalVoteInformation.title: {globalVoteInformation.title}')
             return # Vote is not active or vote is not for the correct topic, exit function.
         
         elif dbFunctions.find_if_vote_exists(app, deviceID, globalVoteInformation) == False:
@@ -167,8 +159,7 @@ def createTopic():
 
         # Validate request.
         if mqttImports.validateKeywordsInJSON(data, ['Title', 'Description', 'StartTime', 'EndTime'], 1) == False:
-            with open('log.txt', 'a') as logFile:
-                logFile.write(f'{datetime.now()}: createTopic(), Invalid request.\n')
+            logHandler.log(f'createTopic(), Invalid request.')
             return jsonify({'message': 'Invalid request.'}), 400
 
         globalVoteInformation.updateVoteInformation(data['Title'], data['Description'], data['StartTime'], data['EndTime'])
@@ -181,8 +172,7 @@ def createTopic():
             return jsonify({'message': 'Topic creation failed.'}), 400
 
     except Exception as errorMsg:
-        with open('log.txt', 'a') as logFile:
-            logFile.write(f'{datetime.now()}: createTopic(), Error: {errorMsg}\n')
+        logHandler.log(f'createTopic(), Error: {errorMsg}')
         return jsonify({'message': 'Internal server error.'}), 500
 
 
@@ -200,19 +190,43 @@ def assignUserToESP():
 
         # Validate request.
         if mqttImports.validateKeywordsInJSON(data, ['username', 'espID'], 1) == False:
-            with open('log.txt', 'a') as logFile:
-                logFile.write(f'{datetime.now()}: assignUserToESP(), Invalid request.\n')
+            logHandler.log(f'assignUserToESP(), Invalid request.')
             return jsonify({'message': 'Invalid request.'}), 400
         
         return dbFunctions.assign_user_to_esp(app, data['username'], data['espID'])
     
     except Exception as errorMsg:
-        with open('log.txt', 'a') as logFile:
-            logFile.write(f'{datetime.now()}: assignUserToESP(), Error: {errorMsg}\n')
+        logHandler.log(f'assignUserToESP(), Error: {errorMsg}')
         return jsonify({'message': f'{str(errorMsg)}'}), 400
 
 
+# Unassign ESP
+@app.route('/api/unassignESP', methods=['POST'])
+def unassignESP():
+    """Input JSON format:
+    {
+        "espID": "INT"
+    }
+    """
+    try:
+        data = request.json
 
+        # Validate request.
+        if mqttImports.validateKeywordsInJSON(data, ['espID'], 1) == False:
+            logHandler.log(f'unassignESP(), Invalid request.')
+            return jsonify({'message': 'Invalid request.'}), 400
+        
+        return dbFunctions.unassign_esp_with_id(app, data['espID'])
+    
+    except Exception as errorMsg:
+        logHandler.log(f'unassignESP(), Error: {errorMsg}')
+        return jsonify({'message': f'{str(errorMsg)}'}), 500
+
+
+# Unassing all ESPs
+@app.route('/api/unassignAllESPs', methods=['UPDATE'])
+def unassignAllESPs():
+    return dbFunctions.unassign_all_esps(app)
 
 
 if __name__ == '__main__':
@@ -223,5 +237,6 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, use_reloader=False)
 
     # Log DB boot info to log file.
-    with open('log.txt', 'a') as logFile:
-        logFile.write(f'{datetime.now()}: Server started.\n')
+    logHandler.log(f'Server started.')
+
+    dbFunctions.find_active_topic(app, globalVoteInformation)

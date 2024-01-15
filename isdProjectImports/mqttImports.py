@@ -2,6 +2,7 @@ from flask_mqtt import Mqtt
 import json
 import random
 from datetime import datetime
+from isdProjectImports import logHandler
 
 mqttBrokerPort = 1883
 mqttKeepAliveSec = 10
@@ -28,8 +29,7 @@ def decodeStringToJSON(json_string):
         decodedMessage = json.loads(json_string)
         return decodedMessage
     except json.decoder.JSONDecodeError as error:
-        with open('log.txt', 'a') as logFile:
-            logFile.write(f'{datetime.now()}: decodeStringToJSON(), JSONDecodeError: {error}\n')
+        logHandler.log(f'JSON decode error: {error}')
         return -1
 
 
@@ -50,6 +50,7 @@ def validateKeywordsInJSON(decodedJSON, keywordList, verifycationLevel):
         return True
 
     else:
+        logHandler.log(f'validateKeywordsInJSON(): Invalid verification level: {verifycationLevel}')
         raise ValueError("Invalid verification level. Please provide either 1 or 2.")
 
 
@@ -59,8 +60,7 @@ def publishJSONtoMQTT(topic, message):
         mqtt.publish(topic, message, qos=mqttQoSLevel)
     except:
         
-        with open('log.txt', 'a') as logFile:
-            logFile.write(f'{datetime.now()}: publishJSONtoMQTT(), Failed to publish message: {str(message)}to topic: {topic}\n')
+        logHandler.log(f'publishJSONtoMQTT: Failed to publish message: {message} to topic: {topic}')
         return False
     else:
         return True
