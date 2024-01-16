@@ -90,7 +90,7 @@ def get_registered_esps(app):
 
             esp_data_list = list(esp_data.values())
 
-            return jsonify(esp_data_list)
+            return jsonify(esp_data_list), 200
 
     except Exception as errorMsg:
         error_message = {"error": str(errorMsg)}
