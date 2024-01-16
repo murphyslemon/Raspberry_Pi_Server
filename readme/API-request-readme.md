@@ -90,7 +90,7 @@
      Example return:
 ```json
 [
-'message': 'Topic created successfully.'
+"message": "Topic created successfully."
 ]
 ```
 - ##   **Assign user to ESP**
@@ -133,7 +133,7 @@
 - ##   **Unassign all ESPs**
     
     -   **Endpoint:** `/api/unassignAllESPs`
-    -   **Method:** `UPDATE` (Note: It is recommended to use DELETE or POST for operations that modify data)
+    -   **Method:** `POST`
     -   **Payload:** None
     -   **Returns:** JSON message indicating the success or failure of unassigning all ESPs + HTTP status code.
          Example return:
