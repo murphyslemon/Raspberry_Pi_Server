@@ -225,7 +225,7 @@ def unassignESP():
 
 
 # Unassing all ESPs
-@app.route('/api/unassignAllESPs', methods=['UPDATE'])
+@app.route('/api/unassignAllESPs', methods=['POST'])
 def unassignAllESPs():
     return dbFunctions.unassign_all_esps(app)
 
