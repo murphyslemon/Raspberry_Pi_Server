@@ -1,3 +1,5 @@
+# DEPRECATED: Do not use!
+
 from flask import Flask
 from flask_mqtt import Mqtt
 import json
@@ -61,9 +63,9 @@ def handle_connect(client, userdata, flags, rc):
 def handle_message(client, userdata, message):
 
 
-@app.route('/')
-def index():
-    return 'Flask MQTT Server is running!'
+#@app.route('/')
+#def index():
+#    return 'Flask MQTT Server is running!'
 
 
 if __name__ == '__main__':
