@@ -1,4 +1,10 @@
 from datetime import datetime
+import os
+
+# Check if the log folder exists, if not create it.
+folder_path = "Logs/"
+if not os.path.exists(folder_path):
+    os.makedirs(folder_path)
 
 # Create logfile name with timestamp.
 # This log file will be used until the server is restarted.
@@ -14,6 +20,7 @@ with open(log_folder + current_logfile_name, 'w') as logFile:
 def log(message):
     """
     Append a timestamped message to the current log file.
+    The function automatically appends a timestamp to the message.
 
     Args:
         - message (str): The log message to be appended.
@@ -27,6 +34,7 @@ def log(message):
 def custom_log(logfile_name, message, logfile_path = ""):
     """
     Append a timestamped message to a specified log file.
+    The function automatically appends a timestamp to the message.
 
     Args:
         - logfile_name (str): The name of the log file (including extension) to which the message will be appended.
