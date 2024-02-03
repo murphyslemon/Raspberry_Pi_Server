@@ -9,6 +9,7 @@ from isdProjectImports import mqttImports
 from isdProjectImports import dbFunctions
 from isdProjectImports import voteHandling
 from isdProjectImports import logHandler
+from flask_cors import CORS
 
 mqttBrokerPort = 1883
 mqttKeepAliveSec = 10
@@ -20,6 +21,7 @@ globalVoteInformationList = []  # List of global vote information objects.
 
 # Flask app setup.
 app = Flask(__name__)
+CORS(app)
 
 # MQTT setup.
 app.config['MQTT_BROKER_URL'] = mqttBrokerIP
