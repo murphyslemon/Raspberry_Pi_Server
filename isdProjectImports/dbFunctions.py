@@ -889,3 +889,5 @@ def find_active_topic(app, vote_info_object):
         # Handle exceptions, log or raise as needed
         logHandler.log(f'dbFunctions.find_active_topic(), ERROR: {str(errorMsg)}')
         return False
+
+

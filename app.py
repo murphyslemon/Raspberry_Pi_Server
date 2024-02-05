@@ -118,6 +118,27 @@ def handle_message(client, userdata, message):
         else:
             dbFunctions.update_vote(app, deviceID, decodedMessage['vote'], globalVoteInformation)
             return # Exit function.
+    
+    # Vote resync handling.
+    elif receivedTopic == "/setupVote/Resync":
+        logHandler.log(f'handle_message(), Message handling going to vote resync handling path.')
+        
+        # Create message.
+        if globalVoteInformation.voteEndTime < datetime.now():
+            resyncMessage = {
+            "VoteTitle": globalVoteInformation.title,
+            "VoteType": "public", #TODO: Redo once private votes are implemented.
+            "VoteStatus": "ended"
+            }
+        else:
+            resyncMessage = {
+                "VoteTitle": globalVoteInformation.title,
+                "VoteType": "public",
+                "VoteStatus": "started"
+            }
+
+        # Send vote information to /setupVote/Resync topic.
+        mqttImports.publishJSONtoMQTT('/setupVote/Setup', resyncMessage)
         
         return # End of vote handling.
 
