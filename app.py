@@ -132,6 +132,10 @@ def handle_message(client, userdata, message):
 def getRegisteredESPs():
     return dbFunctions.get_registered_esps(app)
 
+@app.route('/api/getUnassignedESPs', methods=['GET'])
+def getUnassignedESPs():
+    return dbFunctions.get_unassigned_esps(app)
+
 
 # GET all Topics (votes).
 @app.route('/api/getTopics', methods=['GET'])
@@ -229,6 +233,15 @@ def unassignESP():
 @app.route('/api/unassignAllESPs', methods=['POST'])
 def unassignAllESPs():
     return dbFunctions.unassign_all_esps(app)
+
+
+@app.route('/api/getVotes/<int:topicID>', methods=['GET'])
+def get_votes_by_topic(topicID):
+    """
+    Endpoint to get votes for a specific topic ID.
+    """
+    return dbFunctions.get_votes(app, topicID)
+
 
 
 if __name__ == '__main__':
