@@ -166,23 +166,24 @@ def get_assigned_esps(app):
 
     logHandler.log(f'Running dbFunctions.get_assigned_esps()')
     try:
-        assigned_esps = RegisteredESPs.query.filter_by(Assigned=True).all()
-        assigned_esps_info = []
-        for esp in assigned_esps:
-            user = Users.query.filter_by(UserID=esp.UserID).first()
-            esp_info = {
-                'DeviceIndex': esp.DeviceIndex,
-                'DeviceID': esp.DeviceID,
-                'RegistrationTime': esp.RegistrationTime,
-                'LastActiveTime': esp.LastActiveTime,
-                'Assigned': esp.Assigned,
-                'Registered': esp.Registered,
-                'MacAddress': esp.MacAddress,
-                'Username': user.Username if user else None,
-                'UserID': user.UserID
-            }
-            assigned_esps_info.append(esp_info)
-        return jsonify(assigned_esps_info), 200
+        with app.app_context():
+            assigned_esps = RegisteredESPs.query.filter_by(Assigned=True).all()
+            assigned_esps_info = []
+            for esp in assigned_esps:
+                user = Users.query.filter_by(UserID=esp.UserID).first()
+                esp_info = {
+                    'DeviceIndex': esp.DeviceIndex,
+                    'DeviceID': esp.DeviceID,
+                    'RegistrationTime': esp.RegistrationTime,
+                    'LastActiveTime': esp.LastActiveTime,
+                    'Assigned': esp.Assigned,
+                    'Registered': esp.Registered,
+                    'MacAddress': esp.MacAddress,
+                    'Username': user.Username if user else None,
+                    'UserID': user.UserID
+                }
+                assigned_esps_info.append(esp_info)
+            return jsonify(assigned_esps_info), 200
     except Exception as errorMsg:
         return jsonify({'error': str(errorMsg)}), 500
 
