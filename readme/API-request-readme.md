@@ -218,3 +218,60 @@
 ```   
 -   **Raises:**
     -   **Error (500):** A JSON response with an error message if an exception occurs during the process of retrieving votes.
+
+- ##   **GET Assigned ESP Devices**
+	-   **Endpoint:** `/api/getAssignedESPs`
+	-   **Method:** `GET`
+    -   **Payload:** None
+	-   **Returns:** JSON array containing information about assigned ESP devices + HTTP status code.
+Example return:
+```json
+{
+	"DeviceIndex": 1,
+	"DeviceID": "ABC123",
+	"RegistrationTime": "2024-01-16 12:30:45",
+	"LastActiveTime": "2024-01-16 15:45:20",
+	"Assigned": true,
+	"Registered": true,
+	"MacAddress": "00:11:22:33:44:55",
+	"Username": "john_doe",
+	"UserID": 123
+},
+{
+	"DeviceIndex": 2,
+	"DeviceID": "XYZ789",
+	"RegistrationTime": "2024-01-15 09:10:30",
+	"LastActiveTime": "2024-01-16 14:20:55",
+	"Assigned": true,
+	"Registered": true,
+	"MacAddress": "AA:BB:CC:DD:EE:FF",
+	"Username": "jane_smith",
+	"UserID": 456
+},
+// ... additional entries for other assigned ESP devices
+```
+
+- ## **Get Votes**
+-   **Endpoint:** `/api/getVotes/<TopicID>`
+-   **Method:** `GET`
+-   **Returns:** `JSON array containing information about votes related to a specific topic + HTTP status code.`<br>
+Example return:
+```json
+{
+    "VoteID": 1,
+    "UserID": 123,
+    "VoteType": "upvote",
+    "TopicID": 456,
+    "VoteTime": "2024-02-08 14:30:00"
+},
+{
+    "VoteID": 2,
+    "UserID": 456,
+    "VoteType": "downvote",
+    "TopicID": 456,
+    "VoteTime": "2024-02-08 14:35:00"
+},
+// ... additional entries for other votes
+```   
+-   **Raises:**
+    -   **Error (500):** A JSON response with an error message if an exception occurs during the process of retrieving votes.
