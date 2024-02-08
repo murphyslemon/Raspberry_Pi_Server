@@ -97,6 +97,50 @@ def get_registered_esps(app):
         return jsonify(error_message), 500
 
 
+def get_unassigned_esps(app):
+    """
+    Retrieve information about unassigned ESP devices from the database.
+
+    Args:
+        - app (Flask): The Flask application object.
+
+    Returns:
+        - JSON: A JSON response containing information about unassigned ESP devices.
+            Each device is represented by a dictionary with keys including:
+                - DeviceIndex, DeviceID, RegistrationTime, LastActiveTime, Assigned, Registered, MacAddress.
+
+    Raises:
+        - JSON: A JSON response with an error message and a status code 500 in case of an exception.
+    """
+
+    logHandler.log(f'Running dbFunctions.get_unassigned_esps()')
+    try:
+        with app.app_context():
+            unassigned_esps = (
+                db.session.query(RegisteredESPs)
+                .filter(RegisteredESPs.Registered == True, RegisteredESPs.Assigned == False)
+                .all()
+            )
+
+            esp_data = []
+            for esp in unassigned_esps:
+                esp_data.append({
+                    "DeviceIndex": esp.DeviceIndex,
+                    "DeviceID": esp.DeviceID,
+                    "RegistrationTime": str(esp.RegistrationTime),
+                    "LastActiveTime": str(esp.LastActiveTime),
+                    "Assigned": esp.Assigned,
+                    "Registered": esp.Registered,
+                    "MacAddress": esp.MacAddress,
+                })
+
+            return jsonify(esp_data), 200
+
+    except Exception as errorMsg:
+        error_message = {"error": str(errorMsg)}
+        return jsonify(error_message), 500
+
+
 def get_all_esps(app):
     """
     Retrieve information about all ESP devices from the database.
