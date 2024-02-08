@@ -195,12 +195,15 @@ def createTopic():
 
         globalVoteInformation.updateVoteInformation(data['Title'], data['Description'], data['StartTime'], data['EndTime'])
 
+        # convert datetime string to datetime object
+        voteStartTime = datetime.strptime(globalVoteInformation.voteStartTime, '%Y-%m-%d %H:%M:%S')
+
         # Publish vote information to /setupVote/Setup topic.
-        if globalVoteInformation.voteEndTime < datetime.now():
+        if voteStartTime < datetime.now():
             voteInformationJson = f'{{"VoteTitle":"{globalVoteInformation.title}","VoteType":"public","VoteStatus":"ended"}}'
         else:
             voteInformationJson = f'{{"VoteTitle":"{globalVoteInformation.title}","VoteType":"public","VoteStatus":"started"}}'
-        mqttImports.publishJSONtoMQTT('/setupVote/Setup', globalVoteInformation.getVoteInformation())
+        mqttImports.publishJSONtoMQTT('/setupVote/Setup', voteInformationJson)
 
         # Create new topic in database.
         if dbFunctions.create_topic(app, globalVoteInformation) == True:
