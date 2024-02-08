@@ -151,8 +151,6 @@ def handle_message(client, userdata, message):
     return # End of function.
 
 # API endpoints
-
-# GET all registered ESPs.
 @app.route('/api/getRegisteredESPs', methods=['GET'])
 def getRegisteredESPs():
     return dbFunctions.get_registered_esps(app)
@@ -162,19 +160,16 @@ def getUnassignedESPs():
     return dbFunctions.get_unassigned_esps(app)
 
 
-# GET all Topics (votes).
 @app.route('/api/getTopics', methods=['GET'])
 def getTopics():
     return dbFunctions.get_all_topics(app)
 
 
-# GET Specific Topic (vote).
 @app.route('/api/getTopic/<topicID>', methods=['GET'])
 def getTopic(topicID):
     return dbFunctions.get_topic(app, topicID)
 
 
-# Create new Topic (vote).
 @app.route('/api/createTopic', methods=['POST'])
 def createTopic():
     """Input JSON format:
@@ -217,7 +212,6 @@ def createTopic():
         return jsonify({'message': 'Internal server error.'}), 500
 
 
-# Assign user to ESP.
 @app.route('/api/assignUserToESP', methods=['POST'])
 def assignUserToESP():
     """Input JSON format:
@@ -241,7 +235,6 @@ def assignUserToESP():
         return jsonify({'message': f'{str(errorMsg)}'}), 400
 
 
-# Unassign ESP
 @app.route('/api/unassignESP', methods=['POST'])
 def unassignESP():
     """Input JSON format:
@@ -264,7 +257,6 @@ def unassignESP():
         return jsonify({'message': f'{str(errorMsg)}'}), 500
 
 
-# Unassing all ESPs
 @app.route('/api/unassignAllESPs', methods=['POST'])
 def unassignAllESPs():
     return dbFunctions.unassign_all_esps(app)
@@ -277,6 +269,15 @@ def get_votes_by_topic(topicID):
     """
     return dbFunctions.get_votes(app, topicID)
 
+
+@app.route('/api/getAssignedESPs', methods=['GET'])
+def get_assigned_esps():
+    return dbFunctions.get_assigned_esps(app)
+
+
+@app.route('/api/getVotes/<TopicID>', methods=['GET'])
+def get_votes(TopicID):
+    return dbFunctions.get_votes(app, TopicID)
 
 
 if __name__ == '__main__':
