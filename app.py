@@ -10,6 +10,7 @@ from isdProjectImports import dbFunctions
 from isdProjectImports import voteHandling
 from isdProjectImports import logHandler
 from flask_cors import CORS
+import time # testing purposes
 
 mqttBrokerPort = 1883
 mqttKeepAliveSec = 10
@@ -80,6 +81,9 @@ def handle_message(client, userdata, message):
 
         if registrationStatus == True:
             # return uniqueID to ESP.
+            
+            time.sleep(10000)
+
             mqttImports.mqtt.publish(f'/registration/esp/{macAddress}', f'{{"VotingID":"{registeredESP.DeviceID}"}}', qos=1)
             mqttImports.mqtt.subscribe(f'/registration/ESP/{registeredESP.DeviceID}', qos=1) # Subscribe to ESP's uniqueID topic.
             logHandler.log(f'handle_message(), ESP registration successful, ESP uniqueID: {registeredESP.DeviceID}, ESP MAC address: {registeredESP.MacAddress}\n')
