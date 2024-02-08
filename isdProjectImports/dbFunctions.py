@@ -141,6 +141,52 @@ def get_unassigned_esps(app):
         return jsonify(error_message), 500
 
 
+def get_assigned_esps(app):
+    """
+    Retrieve information about assigned ESP devices from the database.
+
+    Args:
+        - app (Flask): The Flask application object.
+
+    Returns:
+        - JSON: A JSON response containing information about assigned ESP devices.
+            Each device is represented by a dictionary with keys including:
+                - DeviceIndex: The index of the device.
+                - DeviceID: The unique ID of the device.
+                - RegistrationTime: Time of device registration.
+                - LastActiveTime: Time of the device's last activity.
+                - Assigned: Status of device assignment.
+                - Registered: Status of device registration.
+                - MacAddress: MAC address of the device.
+                - AssignedTo: The username of the user the ESP is assigned to.
+
+    Raises:
+        - JSON: A JSON response with an error message and a status code 500 in case of an exception.
+    """
+
+    logHandler.log(f'Running dbFunctions.get_assigned_esps()')
+    try:
+        assigned_esps = RegisteredESPs.query.filter_by(Assigned=True).all()
+        assigned_esps_info = []
+        for esp in assigned_esps:
+            user = Users.query.filter_by(UserID=esp.UserID).first()
+            esp_info = {
+                'DeviceIndex': esp.DeviceIndex,
+                'DeviceID': esp.DeviceID,
+                'RegistrationTime': esp.RegistrationTime,
+                'LastActiveTime': esp.LastActiveTime,
+                'Assigned': esp.Assigned,
+                'Registered': esp.Registered,
+                'MacAddress': esp.MacAddress,
+                'Username': user.Username if user else None,
+                'UserID': user.UserID
+            }
+            assigned_esps_info.append(esp_info)
+        return jsonify(assigned_esps_info), 200
+    except Exception as errorMsg:
+        return jsonify({'error': str(errorMsg)}), 500
+
+
 def get_all_esps(app):
     """
     Retrieve information about all ESP devices from the database.
@@ -309,7 +355,7 @@ def get_votes(app, topicID):
                 }
                 vote_data_list.append(vote_data)
 
-            return jsonify(vote_data_list)
+            return jsonify(vote_data_list), 200
 
     except Exception as errorMsg:
         error_message = {"error": str(errorMsg)}
@@ -726,7 +772,6 @@ def assign_user_to_esp(app, username, espID):
         return str(errorMsg), 500
 
     
-
 def update_vote(app, DeviceID, voteType, topicObject):
     """
     Update the vote type for a user associated with a specific ESP.
