@@ -22,7 +22,7 @@ globalVoteInformationList = []  # List of global vote information objects.
 
 # Flask app setup.
 app = Flask(__name__)
-#CORS(app)
+CORS(app)
 
 # MQTT setup.
 app.config['MQTT_BROKER_URL'] = mqttBrokerIP
