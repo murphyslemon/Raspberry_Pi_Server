@@ -200,9 +200,9 @@ def createTopic():
 
         # Publish vote information to /setupVote/Setup topic.
         if voteStartTime < datetime.now():
-            voteInformationJson = f'{{"VoteTitle":"{globalVoteInformation.title}","VoteType":"public","VoteStatus":"ended"}}'
-        else:
             voteInformationJson = f'{{"VoteTitle":"{globalVoteInformation.title}","VoteType":"public","VoteStatus":"started"}}'
+        else:
+            voteInformationJson = f'{{"VoteTitle":"{globalVoteInformation.title}","VoteType":"public","VoteStatus":"ended"}}'
         mqttImports.publishJSONtoMQTT('/setupVote/Setup', voteInformationJson)
 
         # Create new topic in database.
