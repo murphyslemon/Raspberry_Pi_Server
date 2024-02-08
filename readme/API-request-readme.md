@@ -142,3 +142,79 @@
     "message": "All ESPs unassigned."
 }
 ```
+- ## **Get Votes by Topic ID**
+-   **Endpoint:** `/api/getVotes/<int:topicID>`
+-   **Method:** `GET`
+-   **Parameters:**
+    -   `topicID` (int): The unique ID of the topic to retrieve votes for.
+-   **Returns:**
+    -   **Success (200):** A JSON response containing information about the votes related to the specified topic. The response includes a list of dictionaries, each representing a vote. The keys in each dictionary include:
+        
+        -   `VoteID`: The unique ID of the vote.
+        -   `UserID`: The ID of the user who cast the vote.
+        -   `VoteType`: The type of the vote.
+        -   `TopicID`: The ID of the topic the vote is related to.
+        -   `VoteTime`: The timestamp of when the vote was cast.
+    -   **Error (500):** A JSON response with an error message in case of an exception during the retrieval process.
+        
+-   **Example:**
+    ```json
+    {
+	"VoteID": 1,
+	"UserID": 123,
+	"VoteType": "upvote",
+	"TopicID": 456,
+	"VoteTime": "2024-02-08 14:30:00"
+	},
+	{
+	"VoteID": 2,
+	"UserID": 456,
+	"VoteType": "downvote",
+	"TopicID": 456,
+	"VoteTime": "2024-02-08 14:35:00"
+	}
+	// ... additional entries.
+    ```
+-   **Raises:**
+    -   **Error (500):** A JSON response with an error message if an exception occurs during the process of retrieving votes.
+
+- ## **Get Unassigned ESP Devices**
+-   **Endpoint:** `/api/getUnassignedESPs`
+-   **Method:** `GET`
+-   **Parameters:**
+-   **Returns:**
+    -   **Success (200):** A JSON response containing information about unassigned ESP devices. Each device is represented by a dictionary with keys including:
+        
+        -   `DeviceIndex`: The unique index of the device.
+        -   `DeviceID`: The ID of the ESP device.
+        -   `RegistrationTime`: The timestamp when the device was registered.
+        -   `LastActiveTime`: The timestamp of the device's last activity.
+        -   `Assigned`: Boolean indicating whether the device is assigned (False for unassigned).
+        -   `Registered`: Boolean indicating whether the device is registered.
+        -   `MacAddress`: The MAC address of the ESP device.
+    -   **Error (500):** A JSON response with an error message in case of an exception during the retrieval process.
+        
+-   **Example:**
+```json
+    {
+        "DeviceIndex": 1,
+        "DeviceID": "ESP123",
+        "RegistrationTime": "2024-02-08 14:30:00",
+        "LastActiveTime": "2024-02-08 15:00:00",
+        "Assigned": false,
+        "Registered": true,
+        "MacAddress": "00:11:22:33:44:55"
+    },
+    {
+        "DeviceIndex": 2,
+        "DeviceID": "ESP456",
+        "RegistrationTime": "2024-02-08 14:45:00",
+        "LastActiveTime": "2024-02-08 15:10:00",
+        "Assigned": false,
+        "Registered": true,
+        "MacAddress": "11:22:33:44:55:66"
+    }
+    // ... additional entries.
+```   
+-   **Raises:**
+    -   **Error (500):** A JSON response with an error message if an exception occurs during the process of retrieving votes.
