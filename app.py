@@ -143,17 +143,17 @@ def handle_message(client, userdata, message):
             
             # Create message.
             if globalVoteInformation.voteEndTime < datetime.now():
-                resyncMessage = """{
-                "VoteTitle": globalVoteInformation.title,
-                "VoteType": "public", #TODO: Redo once private votes are implemented.
+                resyncMessage = f"""{{
+                "VoteTitle": "{globalVoteInformation.title}",
+                "VoteType": "public",
                 "VoteStatus": "ended"
-                }"""
+                }}"""
             else:
-                resyncMessage = """{
-                    "VoteTitle": globalVoteInformation.title,
-                    "VoteType": "public",
-                    "VoteStatus": "started"
-                }"""
+                resyncMessage = f"""{{
+                "VoteTitle": "{globalVoteInformation.title}",
+                "VoteType": "public",
+                "VoteStatus": "ended"
+                }}"""
 
             # Send vote information to /setupVote/Resync topic.
             mqttImports.publishJSONtoMQTT('/setupVote/Setup', resyncMessage)
