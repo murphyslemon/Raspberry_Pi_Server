@@ -11,7 +11,7 @@ from isdProjectImports import voteHandling
 from isdProjectImports import logHandler
 from isdProjectImports import startup_procdures
 from flask_cors import CORS
-from threading import Thread
+from threading
 import time # testing purposes
 
 mqttBrokerPort = 1883
