@@ -143,11 +143,11 @@ def handle_message(client, userdata, message):
             
             # Create message.
             if globalVoteInformation.voteEndTime < datetime.now():
-                resyncMessage = {
+                resyncMessage = """{
                 "VoteTitle": globalVoteInformation.title,
                 "VoteType": "public", #TODO: Redo once private votes are implemented.
                 "VoteStatus": "ended"
-                }
+                }"""
             else:
                 resyncMessage = {
                     "VoteTitle": globalVoteInformation.title,
