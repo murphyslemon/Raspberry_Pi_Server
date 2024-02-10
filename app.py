@@ -97,15 +97,18 @@ def handle_message(client, userdata, message):
 
     # Vote handling.
     elif receivedTopic.startswith("/vote/") == True:
+        
         logHandler.log(f'handle_message(), Message handling going to vote handling path.')
 
         # Extract ESP ID from topic.
         deviceID = receivedTopic.split("/")[2]
 
         # Convert strings to datetime objects
-        if globalVoteInformation.voteStartTime != None and globalVoteInformation.voteEndTime != None:
-            vote_end_time = datetime.strptime(globalVoteInformation.voteEndTime, '%Y-%m-%d %H:%M:%S')
-            vote_start_time = datetime.strptime(globalVoteInformation.voteStartTime, '%Y-%m-%d %H:%M:%S')
+        if globalVoteInformation.voteStartTime == None and globalVoteInformation.voteEndTime == None:
+            return # No vote is active
+        
+        vote_end_time = datetime.strptime(globalVoteInformation.voteEndTime, '%Y-%m-%d %H:%M:%S')
+        vote_start_time = datetime.strptime(globalVoteInformation.voteStartTime, '%Y-%m-%d %H:%M:%S')
 
         # Test timing restrictions and if vote is for the correct topic.
         if (
