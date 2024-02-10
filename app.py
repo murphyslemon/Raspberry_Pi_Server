@@ -105,29 +105,35 @@ def handle_message(client, userdata, message):
 
         # Convert strings to datetime objects
         if globalVoteInformation.voteStartTime == None and globalVoteInformation.voteEndTime == None:
-            return # No vote is active
+            return # No vote is active #TODO: Figure out a more reliable way to handle this.
         
-        vote_end_time = datetime.strptime(globalVoteInformation.voteEndTime, '%Y-%m-%d %H:%M:%S')
-        vote_start_time = datetime.strptime(globalVoteInformation.voteStartTime, '%Y-%m-%d %H:%M:%S')
+        try:
+            vote_end_time = datetime.strptime(globalVoteInformation.voteEndTime, '%Y-%m-%d %H:%M:%S')
+            vote_start_time = datetime.strptime(globalVoteInformation.voteStartTime, '%Y-%m-%d %H:%M:%S')
 
-        # Test timing restrictions and if vote is for the correct topic.
-        if (
-            vote_end_time < datetime.now()
-            or vote_start_time > datetime.now()
-            or decodedMessage['VoteTitle'] != globalVoteInformation.title
-        ):
-            logHandler.log(f'handle_message(), vote is not active or vote is not for the correct topic, exit function.')
-            logHandler.log(f'handle_message(), vote_end_time: {vote_end_time}, vote_start_time: {vote_start_time}, datetime.now(): {datetime.now()}')
-            logHandler.log(f'handle_message(), decodedMessage[\'VoteTitle\']: {decodedMessage["VoteTitle"]}, globalVoteInformation.title: {globalVoteInformation.title}')
-            return # Vote is not active or vote is not for the correct topic, exit function.
+            # Test timing restrictions and if vote is for the correct topic.
+            if (
+                vote_end_time < datetime.now()
+                or vote_start_time > datetime.now()
+                or decodedMessage['VoteTitle'] != globalVoteInformation.title
+            ):
+                logHandler.log(f'handle_message(), vote is not active or vote is not for the correct topic, exit function.')
+                logHandler.log(f'handle_message(), vote_end_time: {vote_end_time}, vote_start_time: {vote_start_time}, datetime.now(): {datetime.now()}')
+                logHandler.log(f'handle_message(), decodedMessage[\'VoteTitle\']: {decodedMessage["VoteTitle"]}, globalVoteInformation.title: {globalVoteInformation.title}')
+                return # Vote is not active or vote is not for the correct topic, exit function.
+            
+            elif dbFunctions.find_if_vote_exists(app, deviceID, globalVoteInformation) == False:
+                dbFunctions.create_vote(app, deviceID, decodedMessage['vote'], globalVoteInformation)
+                return # Exit function.
+
+            else:
+                dbFunctions.update_vote(app, deviceID, decodedMessage['vote'], globalVoteInformation)
+                return # Exit function.
         
-        elif dbFunctions.find_if_vote_exists(app, deviceID, globalVoteInformation) == False:
-            dbFunctions.create_vote(app, deviceID, decodedMessage['vote'], globalVoteInformation)
-            return # Exit function.
-
-        else:
-            dbFunctions.update_vote(app, deviceID, decodedMessage['vote'], globalVoteInformation)
-            return # Exit function.
+        except Exception as errorMsg:
+            logHandler.log(f'handle_message(), Another crash in vote handling. Somebody should really fix this shite.')
+            logHandler.log(f'handle_message(), Error: {errorMsg}')
+            return
     
     # Vote resync handling.
     elif receivedTopic == "/setupVote/Resync":
