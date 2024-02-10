@@ -11,6 +11,7 @@ from isdProjectImports import voteHandling
 from isdProjectImports import logHandler
 from isdProjectImports import startup_procdures
 from flask_cors import CORS
+from threading import Thread
 import time # testing purposes
 
 mqttBrokerPort = 1883
@@ -287,24 +288,30 @@ def get_votes_by_topic(topicID):
 def get_assigned_esps():
     return dbFunctions.get_assigned_esps(app)
 
+
 @app.route('/api/forceResync', methods=['GET'])
 def force_resync():
     mqttImports.publishJSONtoMQTT('/setupVote/Resync', '"{“resync”:”---”}"')
     return jsonify({'message': 'Resync message sent.'}), 200
 
 
-# Startup procedures.
-with app.app_context():
-    logHandler.log(f'Server started.')
-    logHandler.log(f'Finding active topic.')
-    dbFunctions.find_active_topic(app, globalVoteInformation)
-    logHandler.log(f'Active topic: {globalVoteInformation.title}, voteStartTime: {globalVoteInformation.voteStartTime}, voteEndTime: {globalVoteInformation.voteEndTime}')
-
+def startup_procedures():
+    with app.app_context():
+        logHandler.log(f'Server started.')
+        logHandler.log(f'Finding active topic.')
+        dbFunctions.find_active_topic(app, globalVoteInformation)
+        logHandler.log(f'Active topic: {globalVoteInformation.title}, voteStartTime: {globalVoteInformation.voteStartTime}, voteEndTime: {globalVoteInformation.voteEndTime}')
 
 if __name__ == '__main__':
     # Initialize imported app extensions.
     dbFunctions.db.init_app(app)
     mqttImports.mqtt.init_app(app)
 
-    app.run(host='0.0.0.0', port=5000, use_reloader=False)
+    # Create a thread for startup procedures.
+    startup_thread = threading.Thread(target=startup_procedures)
 
+    # Start the thread.
+    startup_thread.start()
+
+    # Run the Flask application.
+    app.run(host='0.0.0.0', port=5000, use_reloader=False)
