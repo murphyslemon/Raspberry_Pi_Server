@@ -152,7 +152,7 @@ def handle_message(client, userdata, message):
                 resyncMessage = f"""{{
                 "VoteTitle": "{globalVoteInformation.title}",
                 "VoteType": "public",
-                "VoteStatus": "ended"
+                "VoteStatus": "started"
                 }}"""
 
             # Send vote information to /setupVote/Resync topic.
