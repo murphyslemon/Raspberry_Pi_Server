@@ -134,13 +134,15 @@ def handle_message(client, userdata, message):
             resyncMessage = {
             "VoteTitle": globalVoteInformation.title,
             "VoteType": "public", #TODO: Redo once private votes are implemented.
-            "VoteStatus": "ended"
+            "VoteStatus": "ended",
+            "topicID": globalVoteInformation.topicID
             }
         else:
             resyncMessage = {
                 "VoteTitle": globalVoteInformation.title,
                 "VoteType": "public",
-                "VoteStatus": "started"
+                "VoteStatus": "started",
+                "topicID": globalVoteInformation.topicID
             }
 
         # Send vote information to /setupVote/Resync topic.
@@ -187,25 +189,32 @@ def createTopic():
         if mqttImports.validateKeywordsInJSON(data, ['Title', 'Description', 'StartTime', 'EndTime'], 1) == False:
             logHandler.log(f'createTopic(), Invalid request.')
             return jsonify({'message': 'Invalid request.'}), 400
+        
+        # Check theres no timing conflicts.
+        if dbFunctions.check_conflicting_topics(app, data['StartTime'], data['EndTime']) == True:
+            return jsonify({'message': 'The scheduled time for the topic conflicts with an already existing scheduled topic.'}), 400
 
         globalVoteInformation.updateVoteInformation(data['Title'], data['Description'], data['StartTime'], data['EndTime'])
 
         # convert datetime string to datetime object
         voteStartTime = datetime.strptime(globalVoteInformation.voteStartTime, '%Y-%m-%d %H:%M:%S')
 
-        # Publish vote information to /setupVote/Setup topic.
-        if voteStartTime < datetime.now():
-            voteInformationJson = f'{{"VoteTitle":"{globalVoteInformation.title}","VoteType":"public","VoteStatus":"started"}}'
-        else:
-            voteInformationJson = f'{{"VoteTitle":"{globalVoteInformation.title}","VoteType":"public","VoteStatus":"ended"}}'
-        mqttImports.publishJSONtoMQTT('/setupVote/Setup', voteInformationJson)
-
         # Create new topic in database.
         if dbFunctions.create_topic(app, globalVoteInformation) == True:
             # TODO: figure out voteStartTiming.
+            
+            if voteStartTime < datetime.now():
+                voteInformationJson = f'{{"VoteTitle":"{globalVoteInformation.title}","VoteType":"public","VoteStatus":"started", "topicID": "{globalVoteInformation.topicID}"}}'
+            else:
+                voteInformationJson = f'{{"VoteTitle":"{globalVoteInformation.title}","VoteType":"public","VoteStatus":"ended", "topicID": "{globalVoteInformation.topicID}"}}'
+            mqttImports.publishJSONtoMQTT('/setupVote/Setup', voteInformationJson)
+
             return jsonify({'message': 'Topic created successfully.'}), 200
         else:
             return jsonify({'message': 'Topic creation failed.'}), 400
+        
+        # Publish vote information to /setupVote/Setup topic.
+
 
     except Exception as errorMsg:
         logHandler.log(f'createTopic(), Error: {errorMsg}')

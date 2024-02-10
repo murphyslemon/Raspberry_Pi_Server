@@ -983,3 +983,24 @@ def find_active_topic(app, vote_info_object):
         return False
 
 
+def check_conflicting_topic(app, start_time, end_time):
+    """
+    Check if there is a conflicting topic already created in the database.
+
+    Args:
+        - app (Flask): The Flask application object.
+        - start_time (datetime): The start time of the topic.
+        - end_time (datetime): The end time of the topic.
+
+    Returns:
+        - bool: True if there is no conflicting topic, False if there is a conflicting topic.
+
+    Note:
+        - This function checks if there is any topic in the database that overlaps with the provided start and end time.
+        - Returns True if there is no conflicting topic, False if there is a conflicting topic.
+    """
+
+    logHandler.log(f'Running dbFunctions.check_conflicting_topic()')
+    with app.app_context():
+        conflicting_topic = Topics.query.filter(Topics.StartTime <= end_time, Topics.EndTime >= start_time).first()
+        return conflicting_topic is None
