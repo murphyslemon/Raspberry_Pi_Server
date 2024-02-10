@@ -293,12 +293,12 @@ def force_resync():
 
 
 # Startup procedures.
-logHandler.log(f'Server started.')
+with app.app_context():
+    logHandler.log(f'Server started.')
 
-logHandler.log(f'Finding active topic.')
-dbFunctions.find_active_topic(app, globalVoteInformation)
-logHandler.log(f'Active topic: {globalVoteInformation.title}, voteStartTime: {globalVoteInformation.voteStartTime}, voteEndTime: {globalVoteInformation.voteEndTime}')
-
+    logHandler.log(f'Finding active topic.')
+    dbFunctions.find_active_topic(app, globalVoteInformation)
+    logHandler.log(f'Active topic: {globalVoteInformation.title}, voteStartTime: {globalVoteInformation.voteStartTime}, voteEndTime: {globalVoteInformation.voteEndTime}')
 
 
 if __name__ == '__main__':
