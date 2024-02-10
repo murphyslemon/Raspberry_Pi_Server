@@ -291,8 +291,8 @@ def force_resync():
     mqttImports.publishJSONtoMQTT('/setupVote/Resync', '"{“resync”:”---”}"')
     return jsonify({'message': 'Resync message sent.'}), 200
 
-@app.once_before_first_request
-def startup_functions():
+@app.before_first_request
+def initialize_app():
 # Log DB boot info to log file.
     logHandler.log(f'Server started.')
 
