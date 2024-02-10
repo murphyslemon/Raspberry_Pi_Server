@@ -283,7 +283,7 @@ def get_assigned_esps():
 
 @app.route('/api/forceResync', methods=['GET'])
 def force_resync():
-    mqttImports.publishJSONtoMQTT('/vote/VotingID', 'Resync')
+    mqttImports.publishJSONtoMQTT('/setupVote/Resync', 'Resync')
     return jsonify({'message': 'Resync message sent.'}), 200
 
 
