@@ -149,11 +149,11 @@ def handle_message(client, userdata, message):
                 "VoteStatus": "ended"
                 }"""
             else:
-                resyncMessage = {
+                resyncMessage = """{
                     "VoteTitle": globalVoteInformation.title,
                     "VoteType": "public",
                     "VoteStatus": "started"
-                }
+                }"""
 
             # Send vote information to /setupVote/Resync topic.
             mqttImports.publishJSONtoMQTT('/setupVote/Setup', resyncMessage)
