@@ -291,6 +291,15 @@ def force_resync():
     mqttImports.publishJSONtoMQTT('/setupVote/Resync', '"{“resync”:”---”}"')
     return jsonify({'message': 'Resync message sent.'}), 200
 
+app.before_first_request
+def startup_functions():
+# Log DB boot info to log file.
+    logHandler.log(f'Server started.')
+
+    logHandler.log(f'Finding active topic.')
+    dbFunctions.find_active_topic(app, globalVoteInformation)
+    logHandler.log(f'Active topic: {globalVoteInformation.title}, voteStartTime: {globalVoteInformation.voteStartTime}, voteEndTime: {globalVoteInformation.voteEndTime}')
+
 
 
 if __name__ == '__main__':
@@ -300,9 +309,3 @@ if __name__ == '__main__':
 
     app.run(host='0.0.0.0', port=5000, use_reloader=False)
 
-    # Log DB boot info to log file.
-    logHandler.log(f'Server started.')
-
-    logHandler.log(f'Finding active topic.')
-    dbFunctions.find_active_topic(app, globalVoteInformation)
-    logHandler.log(f'Active topic: {globalVoteInformation.title}, voteStartTime: {globalVoteInformation.voteStartTime}, voteEndTime: {globalVoteInformation.voteEndTime}')
