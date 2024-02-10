@@ -281,6 +281,11 @@ def get_votes_by_topic(topicID):
 def get_assigned_esps():
     return dbFunctions.get_assigned_esps(app)
 
+@app.route('/api/forceResync', methods=['GET'])
+def force_resync():
+    mqttImports.publishJSONtoMQTT('/vote/VotingID', 'Resync')
+    return jsonify({'message': 'Resync message sent.'}), 200
+
 
 
 if __name__ == '__main__':
