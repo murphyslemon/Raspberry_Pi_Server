@@ -9,6 +9,7 @@ from isdProjectImports import mqttImports
 from isdProjectImports import dbFunctions
 from isdProjectImports import voteHandling
 from isdProjectImports import logHandler
+from isdProjectImports import startup_procdures
 from flask_cors import CORS
 import time # testing purposes
 
@@ -295,7 +296,6 @@ def force_resync():
 # Startup procedures.
 with app.app_context():
     logHandler.log(f'Server started.')
-
     logHandler.log(f'Finding active topic.')
     dbFunctions.find_active_topic(app, globalVoteInformation)
     logHandler.log(f'Active topic: {globalVoteInformation.title}, voteStartTime: {globalVoteInformation.voteStartTime}, voteEndTime: {globalVoteInformation.voteEndTime}')
