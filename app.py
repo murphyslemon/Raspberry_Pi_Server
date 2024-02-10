@@ -137,26 +137,31 @@ def handle_message(client, userdata, message):
     
     # Vote resync handling.
     elif receivedTopic == "/setupVote/Resync":
-        logHandler.log(f'handle_message(), Message handling going to vote resync handling path.')
-        
-        # Create message.
-        if globalVoteInformation.voteEndTime < datetime.now():
-            resyncMessage = {
-            "VoteTitle": globalVoteInformation.title,
-            "VoteType": "public", #TODO: Redo once private votes are implemented.
-            "VoteStatus": "ended"
-            }
-        else:
-            resyncMessage = {
+        try:
+            logHandler.log(f'handle_message(), Message handling going to vote resync handling path.')
+            
+            # Create message.
+            if globalVoteInformation.voteEndTime < datetime.now():
+                resyncMessage = {
                 "VoteTitle": globalVoteInformation.title,
-                "VoteType": "public",
-                "VoteStatus": "started"
-            }
+                "VoteType": "public", #TODO: Redo once private votes are implemented.
+                "VoteStatus": "ended"
+                }
+            else:
+                resyncMessage = {
+                    "VoteTitle": globalVoteInformation.title,
+                    "VoteType": "public",
+                    "VoteStatus": "started"
+                }
 
-        # Send vote information to /setupVote/Resync topic.
-        mqttImports.publishJSONtoMQTT('/setupVote/Setup', resyncMessage)
+            # Send vote information to /setupVote/Resync topic.
+            mqttImports.publishJSONtoMQTT('/setupVote/Setup', resyncMessage)
+            
+            return # End of vote handling.
         
-        return # End of vote handling.
+        except Exception as errorMsg:
+            logHandler.log(f'handle_message(), Error: {errorMsg}')
+            return
 
     return # End of function.
 
