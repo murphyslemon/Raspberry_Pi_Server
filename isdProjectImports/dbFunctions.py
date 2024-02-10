@@ -347,12 +347,14 @@ def get_votes(app, topicID):
             vote_data_list = []
 
             for vote in votes:
+                username = Users.query.filter_by(UserID=vote.UserID).first().Username
                 vote_data = {
                     "VoteID": vote.VoteID,
                     "UserID": vote.UserID,
                     "VoteType": vote.VoteType,
                     "TopicID": vote.TopicID,
-                    "VoteTime": str(vote.VoteTime)
+                    "VoteTime": str(vote.VoteTime),
+                    "Username": username
                 }
                 vote_data_list.append(vote_data)
 

@@ -264,9 +264,6 @@ def unassignAllESPs():
 
 @app.route('/api/getVotes/<int:topicID>', methods=['GET'])
 def get_votes_by_topic(topicID):
-    """
-    Endpoint to get votes for a specific topic ID.
-    """
     return dbFunctions.get_votes(app, topicID)
 
 
@@ -274,10 +271,6 @@ def get_votes_by_topic(topicID):
 def get_assigned_esps():
     return dbFunctions.get_assigned_esps(app)
 
-
-@app.route('/api/getVotes/<TopicID>', methods=['GET'])
-def get_votes(TopicID):
-    return dbFunctions.get_votes(app, TopicID)
 
 
 if __name__ == '__main__':
