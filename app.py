@@ -109,8 +109,8 @@ def handle_message(client, userdata, message):
             return # No vote is active #TODO: Figure out a more reliable way to handle this.
         
         try:
-            vote_end_time = datetime.strptime(globalVoteInformation.voteEndTime, '%Y-%m-%d %H:%M:%S')
-            vote_start_time = datetime.strptime(globalVoteInformation.voteStartTime, '%Y-%m-%d %H:%M:%S')
+            vote_end_time = globalVoteInformation.voteEndTime
+            vote_start_time = globalVoteInformation.voteStartTime
 
             # Test timing restrictions and if vote is for the correct topic.
             if (
