@@ -9,7 +9,6 @@ from isdProjectImports import mqttImports
 from isdProjectImports import dbFunctions
 from isdProjectImports import voteHandling
 from isdProjectImports import logHandler
-from isdProjectImports import startup_procdures
 from flask_cors import CORS
 import threading
 import time # testing purposes
