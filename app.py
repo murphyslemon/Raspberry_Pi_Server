@@ -303,4 +303,6 @@ if __name__ == '__main__':
     # Log DB boot info to log file.
     logHandler.log(f'Server started.')
 
+    logHandler.log(f'Finding active topic.')
     dbFunctions.find_active_topic(app, globalVoteInformation)
+    logHandler.log(f'Active topic: {globalVoteInformation.title}, voteStartTime: {globalVoteInformation.voteStartTime}, voteEndTime: {globalVoteInformation.voteEndTime}')
