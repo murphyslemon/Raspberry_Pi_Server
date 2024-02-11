@@ -510,9 +510,13 @@ def register_esp(app, mac_address):
     try:
         with app.app_context():
             registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
+            ID = str(uuid.uuid4())
+
+            logHandler.log(f'Running dbFunctions.add_esp(), subscribing to topic {f"/vote/{ID}"}')
+            mqttImports.mqtt.subscribe(f'/vote/{ID}', qos=1)
 
             if registered_esp:
-                device_id = str(uuid.uuid4())
+                device_id = ID
                 registered_esp.DeviceID = device_id
                 registered_esp.Registered = True
                 db.session.commit()
