@@ -295,7 +295,7 @@ def force_resync():
 
 
 def startup_procedures():
-    time.sleep(3)
+    time.sleep(3) # Wait for app to be fully initialized.
     with app.app_context():
         logHandler.log(f'Server started.')
         logHandler.log(f'Finding active topic.')
