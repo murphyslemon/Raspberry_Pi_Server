@@ -566,6 +566,7 @@ def add_esp(app, mac_address):
             return registered_esp, True
 
     except Exception as errorMsg:
+        logHandler.log(f'Running dbFunctions.add_esp(), {str(errorMsg)}')
         return str(errorMsg), False
 
 
