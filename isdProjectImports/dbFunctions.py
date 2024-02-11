@@ -836,16 +836,20 @@ def find_if_vote_exists(app, DeviceID, topicObject):
     - bool: True if a vote exists for the specified ESP and topic, False otherwise.
     """
 
-    logHandler.log(f'Running dbFunctions.find_if_vote_exists()')
-    logHandler.log(f'Running dbFunctions.find_if_vote_exists(), DeviceID: {DeviceID}, topicObject: {topicObject}')
-    with app.app_context():
-        esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
-        vote = Votes.query.filter_by(UserID=esp.UserID, TopicID=topicObject.topicID).first()
+    try:
+        logHandler.log(f'Running dbFunctions.find_if_vote_exists()')
+        logHandler.log(f'Running dbFunctions.find_if_vote_exists(), DeviceID: {DeviceID}, topicObject: {topicObject}')
+        with app.app_context():
+            esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
+            vote = Votes.query.filter_by(UserID=esp.UserID, TopicID=topicObject.topicID).first()
 
-        if vote:
-            return True
-        else:
-            return False
+            if vote:
+                return True
+            else:
+                return False
+    except Exception as errorMsg:
+        logHandler.log(f'Running dbFunctions.find_if_vote_exists(), {str(errorMsg)}')
+        return False
 
 
 def create_vote(app, DeviceID, voteType, topicObject):
