@@ -19,9 +19,9 @@ registrationResponeTopic = '/registration/esp/'  # + mac address, server will re
 voteSetupTopic = '/setupVote/Setup'  # Vote information is posted here.
 voteResyncTopic = '/setupVote/Resync'  # ESPs will request resync with this topic.
 # Vote topics
-voteIncomingTopic = '/vote/#'  # + votingID, ESPs will send votes to this topic.
+voteIncomingTopic = '/vote/#'  # + votingID, ESPs will send votes to this topic. DO NOT SUBSCRIBE TO THIS TOPIC, CAUSES DEVICEID TO BE MISSED.
 
-initialSubscribeTopics = [registrationIncomingTopic, voteResyncTopic, voteIncomingTopic]
+initialSubscribeTopics = [registrationIncomingTopic, voteResyncTopic] 
 
 # Decodes JSON string to Python dictionary.
 def decodeStringToJSON(json_string):

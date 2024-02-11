@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import jsonify
 from isdProjectImports import logHandler
 from isdProjectImports import voteHandling
+from isdProjectImports import mqttImports
 from collections import defaultdict
 import uuid
 
@@ -552,10 +553,13 @@ def add_esp(app, mac_address):
 
     logHandler.log(f'Running dbFunctions.add_esp()')
     try:
+        ID = str(uuid.uuid4())
         with app.app_context():
-            add_esp = RegisteredESPs(MacAddress=mac_address, Registered=True, DeviceID=str(uuid.uuid4()))
+            add_esp = RegisteredESPs(MacAddress=mac_address, Registered=True, DeviceID=ID)
             db.session.add(add_esp)
             db.session.commit()
+
+            mqttImports.mqtt.subscribe(ID, qos=1)
 
             # Return the instance of RegisteredESPs
             registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
@@ -827,6 +831,7 @@ def find_if_vote_exists(app, DeviceID, topicObject):
     """
 
     logHandler.log(f'Running dbFunctions.find_if_vote_exists()')
+    logHandler.log(f'Running dbFunctions.find_if_vote_exists(), DeviceID: {DeviceID}, topicObject: {topicObject}')
     with app.app_context():
         esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
         vote = Votes.query.filter_by(UserID=esp.UserID, TopicID=topicObject.topicID).first()
