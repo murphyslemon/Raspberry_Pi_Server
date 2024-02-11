@@ -559,6 +559,7 @@ def add_esp(app, mac_address):
             db.session.add(add_esp)
             db.session.commit()
 
+            logHandler.log(f'Running dbFunctions.add_esp(), subscribing to topic {f"/vote/{ID}"}')
             mqttImports.mqtt.subscribe(f'/vote/{ID}', qos=1)
 
             # Return the instance of RegisteredESPs
