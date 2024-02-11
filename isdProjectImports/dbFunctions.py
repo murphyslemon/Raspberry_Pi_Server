@@ -512,8 +512,8 @@ def register_esp(app, mac_address):
             registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
             ID = str(uuid.uuid4())
 
-            logHandler.log(f'Running dbFunctions.add_esp(), subscribing to topic {f"/vote/{ID}"}')
-            mqttImports.mqtt.subscribe(f'/vote/{ID}', qos=1)
+            #logHandler.log(f'Running dbFunctions.add_esp(), subscribing to topic {f"/vote/{ID}"}')
+            #mqttImports.mqtt.subscribe(f'/vote/{ID}', qos=1)
 
             if registered_esp:
                 device_id = ID
@@ -563,8 +563,8 @@ def add_esp(app, mac_address):
             db.session.add(add_esp)
             db.session.commit()
 
-            logHandler.log(f'Running dbFunctions.add_esp(), subscribing to topic {f"/vote/{ID}"}')
-            mqttImports.mqtt.subscribe(f'/vote/{ID}', qos=1)
+            #logHandler.log(f'Running dbFunctions.add_esp(), subscribing to topic {f"/vote/{ID}"}')
+            #mqttImports.mqtt.subscribe(f'/vote/{ID}', qos=1)
 
             # Return the instance of RegisteredESPs
             registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
