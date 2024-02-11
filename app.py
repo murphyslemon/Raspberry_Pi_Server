@@ -10,6 +10,7 @@ from isdProjectImports import dbFunctions
 from isdProjectImports import voteHandling
 from isdProjectImports import logHandler
 from flask_cors import CORS
+import threading
 import time # testing purposes
 
 mqttBrokerPort = 1883
@@ -97,59 +98,71 @@ def handle_message(client, userdata, message):
 
     # Vote handling.
     elif receivedTopic.startswith("/vote/") == True:
+        
         logHandler.log(f'handle_message(), Message handling going to vote handling path.')
 
         # Extract ESP ID from topic.
         deviceID = receivedTopic.split("/")[2]
 
         # Convert strings to datetime objects
-        if globalVoteInformation.voteStartTime != None and globalVoteInformation.voteEndTime != None:
-            vote_end_time = datetime.strptime(globalVoteInformation.voteEndTime, '%Y-%m-%d %H:%M:%S')
-            vote_start_time = datetime.strptime(globalVoteInformation.voteStartTime, '%Y-%m-%d %H:%M:%S')
-
-        # Test timing restrictions and if vote is for the correct topic.
-        if (
-            vote_end_time < datetime.now()
-            or vote_start_time > datetime.now()
-            or decodedMessage['VoteTitle'] != globalVoteInformation.title
-        ):
-            logHandler.log(f'handle_message(), vote is not active or vote is not for the correct topic, exit function.')
-            logHandler.log(f'handle_message(), vote_end_time: {vote_end_time}, vote_start_time: {vote_start_time}, datetime.now(): {datetime.now()}')
-            logHandler.log(f'handle_message(), decodedMessage[\'VoteTitle\']: {decodedMessage["VoteTitle"]}, globalVoteInformation.title: {globalVoteInformation.title}')
-            return # Vote is not active or vote is not for the correct topic, exit function.
+        if globalVoteInformation.voteStartTime == None and globalVoteInformation.voteEndTime == None:
+            return # No vote is active #TODO: Figure out a more reliable way to handle this.
         
-        elif dbFunctions.find_if_vote_exists(app, deviceID, globalVoteInformation) == False:
-            dbFunctions.create_vote(app, deviceID, decodedMessage['vote'], globalVoteInformation)
-            return # Exit function.
+        try:
+            vote_end_time = globalVoteInformation.voteEndTime
+            vote_start_time = globalVoteInformation.voteStartTime
 
-        else:
-            dbFunctions.update_vote(app, deviceID, decodedMessage['vote'], globalVoteInformation)
-            return # Exit function.
+            # Test timing restrictions and if vote is for the correct topic.
+            if (
+                vote_end_time < datetime.now()
+                or vote_start_time > datetime.now()
+                or decodedMessage['VoteTitle'] != globalVoteInformation.title
+            ):
+                logHandler.log(f'handle_message(), vote is not active or vote is not for the correct topic, exit function.')
+                logHandler.log(f'handle_message(), vote_end_time: {vote_end_time}, vote_start_time: {vote_start_time}, datetime.now(): {datetime.now()}')
+                logHandler.log(f'handle_message(), decodedMessage[\'VoteTitle\']: {decodedMessage["VoteTitle"]}, globalVoteInformation.title: {globalVoteInformation.title}')
+                return # Vote is not active or vote is not for the correct topic, exit function.
+            
+            elif dbFunctions.find_if_vote_exists(app, deviceID, globalVoteInformation) == False:
+                dbFunctions.create_vote(app, deviceID, decodedMessage['vote'], globalVoteInformation)
+                return # Exit function.
+
+            else:
+                dbFunctions.update_vote(app, deviceID, decodedMessage['vote'], globalVoteInformation)
+                return # Exit function.
+        
+        except Exception as errorMsg:
+            logHandler.log(f'handle_message(), Another crash in vote handling. Somebody should really fix this shite.')
+            logHandler.log(f'handle_message(), Error: {errorMsg}')
+            return
     
     # Vote resync handling.
     elif receivedTopic == "/setupVote/Resync":
-        logHandler.log(f'handle_message(), Message handling going to vote resync handling path.')
-        
-        # Create message.
-        if globalVoteInformation.voteEndTime < datetime.now():
-            resyncMessage = {
-            "VoteTitle": globalVoteInformation.title,
-            "VoteType": "public", #TODO: Redo once private votes are implemented.
-            "VoteStatus": "ended",
-            "topicID": globalVoteInformation.topicID
-            }
-        else:
-            resyncMessage = {
-                "VoteTitle": globalVoteInformation.title,
+        try:
+            logHandler.log(f'handle_message(), Message handling going to vote resync handling path.')
+            
+            # Create message.
+            if globalVoteInformation.voteEndTime < datetime.now():
+                resyncMessage = f"""{{
+                "VoteTitle": "{globalVoteInformation.title}",
                 "VoteType": "public",
-                "VoteStatus": "started",
-                "topicID": globalVoteInformation.topicID
-            }
+                "VoteStatus": "ended"
+                }}"""
+            else:
+                resyncMessage = f"""{{
+                "VoteTitle": "{globalVoteInformation.title}",
+                "VoteType": "public",
+                "VoteStatus": "started"
+                }}"""
 
-        # Send vote information to /setupVote/Resync topic.
-        mqttImports.publishJSONtoMQTT('/setupVote/Setup', resyncMessage)
+            # Send vote information to /setupVote/Resync topic.
+            mqttImports.publishJSONtoMQTT('/setupVote/Setup', resyncMessage)
+            
+            return # End of vote handling.
         
-        return # End of vote handling.
+        except Exception as errorMsg:
+            logHandler.log(f'handle_message(), Error: {errorMsg}')
+            return
 
     return # End of function.
 
@@ -282,15 +295,30 @@ def get_assigned_esps():
     return dbFunctions.get_assigned_esps(app)
 
 
+@app.route('/api/forceResync', methods=['GET'])
+def force_resync():
+    mqttImports.publishJSONtoMQTT('/setupVote/Resync', '"{“resync”:”---”}"')
+    return jsonify({'message': 'Resync message sent.'}), 200
+
+
+def startup_procedures():
+    time.sleep(3) # Wait for app to be fully initialized.
+    with app.app_context():
+        logHandler.log(f'Server started.')
+        logHandler.log(f'Finding active topic.')
+        dbFunctions.find_active_topic(app, globalVoteInformation)
+        logHandler.log(f'Active topic: {globalVoteInformation.title}, voteStartTime: {globalVoteInformation.voteStartTime}, voteEndTime: {globalVoteInformation.voteEndTime}')
 
 if __name__ == '__main__':
     # Initialize imported app extensions.
     dbFunctions.db.init_app(app)
     mqttImports.mqtt.init_app(app)
 
+    # Create a thread for startup procedures.
+    startup_thread = threading.Thread(target=startup_procedures)
+
+    # Start the thread.
+    startup_thread.start()
+
+    # Run the Flask application.
     app.run(host='0.0.0.0', port=5000, use_reloader=False)
-
-    # Log DB boot info to log file.
-    logHandler.log(f'Server started.')
-
-    dbFunctions.find_active_topic(app, globalVoteInformation)

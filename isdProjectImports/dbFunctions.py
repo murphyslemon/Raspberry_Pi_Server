@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import jsonify
 from isdProjectImports import logHandler
 from isdProjectImports import voteHandling
+from isdProjectImports import mqttImports
 from collections import defaultdict
 import uuid
 
@@ -509,9 +510,13 @@ def register_esp(app, mac_address):
     try:
         with app.app_context():
             registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
+            ID = str(uuid.uuid4())
+
+            #logHandler.log(f'Running dbFunctions.add_esp(), subscribing to topic {f"/vote/{ID}"}')
+            #mqttImports.mqtt.subscribe(f'/vote/{ID}', qos=1)
 
             if registered_esp:
-                device_id = str(uuid.uuid4())
+                device_id = ID
                 registered_esp.DeviceID = device_id
                 registered_esp.Registered = True
                 db.session.commit()
@@ -552,16 +557,21 @@ def add_esp(app, mac_address):
 
     logHandler.log(f'Running dbFunctions.add_esp()')
     try:
+        ID = str(uuid.uuid4())
         with app.app_context():
-            add_esp = RegisteredESPs(MacAddress=mac_address, Registered=True, DeviceID=str(uuid.uuid4()))
+            add_esp = RegisteredESPs(MacAddress=mac_address, Registered=True, DeviceID=ID)
             db.session.add(add_esp)
             db.session.commit()
+
+            #logHandler.log(f'Running dbFunctions.add_esp(), subscribing to topic {f"/vote/{ID}"}')
+            #mqttImports.mqtt.subscribe(f'/vote/{ID}', qos=1)
 
             # Return the instance of RegisteredESPs
             registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
             return registered_esp, True
 
     except Exception as errorMsg:
+        logHandler.log(f'Running dbFunctions.add_esp(), {str(errorMsg)}')
         return str(errorMsg), False
 
 
@@ -826,15 +836,20 @@ def find_if_vote_exists(app, DeviceID, topicObject):
     - bool: True if a vote exists for the specified ESP and topic, False otherwise.
     """
 
-    logHandler.log(f'Running dbFunctions.find_if_vote_exists()')
-    with app.app_context():
-        esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
-        vote = Votes.query.filter_by(UserID=esp.UserID, TopicID=topicObject.topicID).first()
+    try:
+        logHandler.log(f'Running dbFunctions.find_if_vote_exists()')
+        logHandler.log(f'Running dbFunctions.find_if_vote_exists(), DeviceID: {DeviceID}, topicObject: {topicObject}')
+        with app.app_context():
+            esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
+            vote = Votes.query.filter_by(UserID=esp.UserID, TopicID=topicObject.topicID).first()
 
-        if vote:
-            return True
-        else:
-            return False
+            if vote:
+                return True
+            else:
+                return False
+    except Exception as errorMsg:
+        logHandler.log(f'Running dbFunctions.find_if_vote_exists(), {str(errorMsg)}')
+        return False
 
 
 def create_vote(app, DeviceID, voteType, topicObject):
