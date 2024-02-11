@@ -559,7 +559,7 @@ def add_esp(app, mac_address):
             db.session.add(add_esp)
             db.session.commit()
 
-            mqttImports.mqtt.subscribe(ID, qos=1)
+            mqttImports.mqtt.subscribe(f'/vote/{ID}', qos=1)
 
             # Return the instance of RegisteredESPs
             registered_esp = RegisteredESPs.query.filter_by(MacAddress=mac_address).first()
