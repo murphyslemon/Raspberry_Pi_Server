@@ -110,7 +110,9 @@ def handle_message(client, userdata, message):
         
         try:
             vote_end_time = globalVoteInformation.voteEndTime
+            datetime.strptime(vote_end_time, "%Y-%m-%d %H:%M:%S")
             vote_start_time = globalVoteInformation.voteStartTime
+            datetime.strptime(vote_start_time, "%Y-%m-%d %H:%M:%S")
 
             # Test timing restrictions and if vote is for the correct topic.
             if (
