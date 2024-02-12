@@ -3,14 +3,13 @@ import json
 import random
 from datetime import datetime
 from isdProjectImports import logHandler
-import app as APP
 
 mqttBrokerPort = 1883
 mqttKeepAliveSec = 10
 mqttBrokerIP = 'localhost'  # Replace with broker IP if not running locally.
 mqttQoSLevel = 1
 
-mqtt = Mqtt(APP.app)
+mqtt = Mqtt()
 
 # Topics
 # Registration topics

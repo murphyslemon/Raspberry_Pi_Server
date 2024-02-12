@@ -42,7 +42,7 @@ def index():
 
 
 # Subscribe to all topics in 'initialSubscribeTopics' list when server is started.
-@mqttImports.Mqtt.on_connect()
+@mqttImports.mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
    if rc == 0:
        for topic in mqttImports.initialSubscribeTopics:
