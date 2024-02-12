@@ -83,7 +83,7 @@ def handle_message(client, userdata, message):
         if registrationStatus == True:
             # return uniqueID to ESP.
             
-            time.sleep(10) #TODO: remove this once ESP is updated to handle the registration response.
+            #time.sleep(10) #TODO: remove this once ESP is updated to handle the registration response.
 
             mqttImports.mqtt.publish(f'/registration/esp/{macAddress}', f'{{"VotingID":"{registeredESP.DeviceID}"}}', qos=1)
             mqttImports.mqtt.subscribe(f'/registration/ESP/{registeredESP.DeviceID}', qos=1) # Subscribe to ESP's uniqueID topic.

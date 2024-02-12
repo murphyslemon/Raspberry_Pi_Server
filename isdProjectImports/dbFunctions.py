@@ -874,7 +874,7 @@ def create_vote(app, DeviceID, voteType, topicObject):
         with app.app_context():
             esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
             
-            # create vote if esp is assigned
+            # create vote if esp is assigned   
             if esp.Assigned:
                 user = Users.query.filter_by(UserID=esp.UserID).first()
                 vote = Votes(UserID=user.UserID, VoteType=voteType, TopicID=topicObject.topicID)
