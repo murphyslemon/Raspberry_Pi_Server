@@ -3,7 +3,7 @@ import json
 import random
 from datetime import datetime
 from isdProjectImports import logHandler
-from isdProjectImports import app as APP
+import app as APP
 
 mqttBrokerPort = 1883
 mqttKeepAliveSec = 10
