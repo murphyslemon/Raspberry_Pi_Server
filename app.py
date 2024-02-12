@@ -115,6 +115,9 @@ def handle_message(client, userdata, message):
             #datetime.strptime(vote_start_time, "%Y-%m-%d %H:%M:%S")
 
             # Test timing restrictions and if vote is for the correct topic.
+            logHandler.log(f'handle_message(), vote_end_time: {vote_end_time}, vote_start_time: {vote_start_time}, datetime.now(): {datetime.now()}')
+            logHandler.log(f'handle_message(), decodedMessage[\'VoteTitle\']: {decodedMessage["VoteTitle"]}, globalVoteInformation.title: {globalVoteInformation.title}')
+            
             if (
                 vote_end_time < datetime.now()
                 or vote_start_time > datetime.now()
