@@ -110,9 +110,9 @@ def handle_message(client, userdata, message):
         
         try:
             vote_end_time = globalVoteInformation.voteEndTime
-            datetime.strptime(vote_end_time, "%Y-%m-%d %H:%M:%S")
+            #datetime.strptime(vote_end_time, "%Y-%m-%d %H:%M:%S")
             vote_start_time = globalVoteInformation.voteStartTime
-            datetime.strptime(vote_start_time, "%Y-%m-%d %H:%M:%S")
+            #datetime.strptime(vote_start_time, "%Y-%m-%d %H:%M:%S")
 
             # Test timing restrictions and if vote is for the correct topic.
             if (
@@ -206,10 +206,10 @@ def createTopic():
             logHandler.log(f'createTopic(), Invalid request.')
             return jsonify({'message': 'Invalid request.'}), 400
 
-        globalVoteInformation.updateVoteInformation(data['Title'], data['Description'], data['StartTime'], data['EndTime'])
+        globalVoteInformation.updateVoteInformation(data['Title'], data['Description'], datetime.strptime(data['StartTime'], '%Y-%m-%d %H:%M:%S'), data['EndTime'])
 
         # convert datetime string to datetime object
-        voteStartTime = datetime.strptime(globalVoteInformation.voteStartTime, '%Y-%m-%d %H:%M:%S')
+        voteStartTime = globalVoteInformation.voteStartTime
 
         # Publish vote information to /setupVote/Setup topic.
         if voteStartTime < datetime.now():
