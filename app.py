@@ -147,9 +147,7 @@ def handle_message(client, userdata, message):
             logHandler.log(f'handle_message(), Message handling going to vote resync handling path.')
             
             # Create message.
-            vote_end_time = globalVoteInformation.voteEndTime
-            datetime.strptime(vote_end_time, "%Y-%m-%d %H:%M:%S")
-            if vote_end_time < datetime.now():
+            if globalVoteInformation.voteEndTime < datetime.now():
                 resyncMessage = f"""{{
                 "VoteTitle": "{globalVoteInformation.title}",
                 "VoteType": "public",
