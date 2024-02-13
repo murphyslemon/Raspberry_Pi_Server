@@ -110,14 +110,14 @@ def handle_message(client, userdata, message):
         
         try:
             vote_end_time = globalVoteInformation.voteEndTime
-            #datetime.strptime(vote_end_time, "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(vote_end_time, "%Y-%m-%d %H:%M:%S")
             vote_start_time = globalVoteInformation.voteStartTime
             #datetime.strptime(vote_start_time, "%Y-%m-%d %H:%M:%S")
 
             # Test timing restrictions and if vote is for the correct topic.
             logHandler.log(f'handle_message(), vote_end_time: {vote_end_time}, vote_start_time: {vote_start_time}, datetime.now(): {datetime.now()}')
             logHandler.log(f'handle_message(), decodedMessage[\'VoteTitle\']: {decodedMessage["VoteTitle"]}, globalVoteInformation.title: {globalVoteInformation.title}')
-            
+
             if (
                 vote_end_time < datetime.now()
                 or vote_start_time > datetime.now()
@@ -147,7 +147,9 @@ def handle_message(client, userdata, message):
             logHandler.log(f'handle_message(), Message handling going to vote resync handling path.')
             
             # Create message.
-            if globalVoteInformation.voteEndTime < datetime.now():
+            vote_end_time = globalVoteInformation.voteEndTime
+            datetime.strptime(vote_end_time, "%Y-%m-%d %H:%M:%S")
+            if vote_end_time < datetime.now():
                 resyncMessage = f"""{{
                 "VoteTitle": "{globalVoteInformation.title}",
                 "VoteType": "public",
