@@ -840,6 +840,7 @@ def find_if_vote_exists(app, DeviceID, topicObject):
         logHandler.log(f'Running dbFunctions.find_if_vote_exists()')
         logHandler.log(f'Running dbFunctions.find_if_vote_exists(), DeviceID: {DeviceID}, topicObject: {topicObject}')
         with app.app_context():
+            logHandler.log(f'Running dbFunctions.find_if_vote_exists(), DeviceID: {DeviceID}')
             esp = RegisteredESPs.query.filter_by(DeviceID=DeviceID).first()
             vote = Votes.query.filter_by(UserID=esp.UserID, TopicID=topicObject.topicID).first()
 
